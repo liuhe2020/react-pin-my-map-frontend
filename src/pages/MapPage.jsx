@@ -1,12 +1,15 @@
 import styled from "styled-components";
 import { useState, useEffect } from "react";
-import ReactMapGL, { Marker, Popup } from "react-map-gl";
+import ReactMapGL, { Popup } from "react-map-gl";
+import "mapbox-gl/dist/mapbox-gl.css";
 import { ToastContainer, toast } from "react-toastify";
-import useFetch from "../utilities/useFetch";
+import "react-toastify/dist/ReactToastify.css";
+import SyncLoader from "react-spinners/SyncLoader";
 import Pin from "../components/Pin";
 import AddPin from "../components/AddPin";
 
 const MapPage = () => {
+  const [loading, setLoading] = useState(false);
   const [pins, setPins] = useState(null);
   const [currentPinId, setCurrentPinId] = useState(null);
   const [newCoord, setNewCoord] = useState(null);
@@ -23,6 +26,7 @@ const MapPage = () => {
     setNewCoord({ lat, long });
   };
 
+  // re-run effect @newCoord when a new pin is added
   useEffect(() => {
     const getPins = async () => {
       const res = await fetch(`${process.env.REACT_APP_API_URL}/pins`);
@@ -34,7 +38,7 @@ const MapPage = () => {
       }
     };
     getPins();
-  }, []);
+  }, [loading]);
 
   return (
     <ReactMapGL
@@ -53,6 +57,7 @@ const MapPage = () => {
             setViewport={setViewport}
             currentPinId={currentPinId}
             setCurrentPinId={setCurrentPinId}
+            setLoading={setLoading}
           />
         ))}
       {newCoord && (
@@ -68,8 +73,14 @@ const MapPage = () => {
             newCoord={newCoord}
             setNewCoord={setNewCoord}
             setPins={setPins}
+            setLoading={setLoading}
           />
         </Popup>
+      )}
+      {loading && (
+        <LoaderOverlay>
+          <SyncLoader color="#ed6c02" loading={loading} />
+        </LoaderOverlay>
       )}
       <ToastContainer
         position="top-left"
@@ -87,3 +98,15 @@ const MapPage = () => {
 };
 
 export default MapPage;
+
+const LoaderOverlay = styled.div`
+  position: absolute;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background-color: rgba(250, 250, 250, 0.7);
+`;

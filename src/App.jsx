@@ -1,5 +1,4 @@
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
-
 import GlobalStyles from "./globalStyles";
 import Header from "./components/Header";
 import LoginPage from "./pages/LoginPage";

@@ -5,15 +5,15 @@ import LocalizationProvider from "@mui/lab/LocalizationProvider";
 import DesktopDatePicker from "@mui/lab/DesktopDatePicker";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import { ResetTvRounded, Room } from "@mui/icons-material";
+import { Room } from "@mui/icons-material";
 import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
-const AddPin = ({ newCoord, setNewCoord, setPins }) => {
+const AddPin = ({ newCoord, setNewCoord, setLoading }) => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [images, setImages] = useState([]);
   const [imageUrls, setImageUrls] = useState(null);
   const [isEmpty, setIsEmpty] = useState(false);
+
   const [values, setValues] = useState({
     location: "",
     description: "",
@@ -25,7 +25,15 @@ const AddPin = ({ newCoord, setNewCoord, setPins }) => {
 
   const handleImageChange = (e) => {
     // convert Filelist object to array and update in images state
-    setImages([...e.target.files]);
+    const imageFiles = [...e.target.files];
+    // check images size
+    const bigImages = imageFiles.filter((file) => file.size > 1024 * 5000);
+
+    if (bigImages.length > 0) {
+      toast("The maximum size for each image is 5MB.");
+    } else {
+      setImages([...imageFiles]);
+    }
   };
 
   useEffect(() => {
@@ -50,6 +58,8 @@ const AddPin = ({ newCoord, setNewCoord, setPins }) => {
       return;
     }
 
+    setLoading(true);
+
     const submitValues = { ...values, date: selectedDate };
     const formData = new FormData();
     formData.append("data", JSON.stringify(submitValues));
@@ -64,36 +74,13 @@ const AddPin = ({ newCoord, setNewCoord, setPins }) => {
       body: formData,
     });
 
-    // const res = await fetch("http://localhost:1337/pins", {
-    //   method: "POST",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify(submitValues),
-    // });
-
-    // if (!res.ok) {
-    //   throw Error("Failed to upload data, please try again later.");
-    // } else {
-    //   const data = await res.json();
-
-    //   if (images.length > 0) {
-    //     const formData = new FormData();
-    //     formData.append("ref", "pins");
-    //     formData.append("refId", data.id);
-    //     formData.append("field", "photos");
-    //     images.forEach((image) => formData.append(`files`, image, image.name));
-
-    //     const res = await fetch("http://localhost:1337/upload", {
-    //       method: "POST",
-    //       body: formData,
-    //     });
-
-    //     if (res.ok) {
-    //       toast(`Added ${submitValues.location}!`);
-    //       setNewCoord(null);
-    //       setPins(null);
-    //     }
-    //   }
-    // }
+    if (res.ok) {
+      setNewCoord(null);
+      setLoading(false);
+      toast(`Pin added - ${submitValues.location}`);
+    } else {
+      toast("Network error. Please try again later.");
+    }
   };
 
   return (
@@ -139,6 +126,7 @@ const AddPin = ({ newCoord, setNewCoord, setPins }) => {
               ))}
             </PhotosGrid>
           )}
+          <p>The maximum image size is 5MB.</p>
           <label htmlFor="contained-button-file">
             <Input
               accept="image/*"
@@ -169,6 +157,7 @@ export default AddPin;
 
 const Container = styled.div`
   cursor: initial;
+  width: 400px;
 `;
 
 const Title = styled.div`
@@ -183,7 +172,7 @@ const Form = styled.form`
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 400px;
+  width: 100%;
 
   .MuiTextField-root {
     width: 95%;
@@ -210,6 +199,12 @@ const PhotoContainer = styled.div`
 
   label {
     margin: auto;
+  }
+
+  p {
+    text-align: center;
+    color: #bdbdbd;
+    font-size: 14px;
   }
 `;
 

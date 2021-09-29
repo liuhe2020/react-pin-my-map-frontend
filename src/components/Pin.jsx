@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Marker, Popup, FlyToInterpolator } from "react-map-gl";
 import { easeCubic } from "d3-ease";
 import { Room, Today, TextSnippet } from "@mui/icons-material";
@@ -8,7 +8,14 @@ import ImageGallery from "react-image-gallery";
 import "react-image-gallery/styles/css/image-gallery.css";
 import EditPin from "./EditPin";
 
-const Pin = ({ pin, viewport, setViewport, currentPinId, setCurrentPinId }) => {
+const Pin = ({
+  pin,
+  viewport,
+  setViewport,
+  currentPinId,
+  setCurrentPinId,
+  setLoading,
+}) => {
   const [isEditing, setIsEditing] = useState(false);
   const { id, location, date, latitude, longitude, description, photos } = pin;
   const photoUrls = photos.map((photo) => ({
@@ -26,6 +33,11 @@ const Pin = ({ pin, viewport, setViewport, currentPinId, setCurrentPinId }) => {
       transitionDuration: 800,
       transitionEasing: easeCubic,
     });
+  };
+
+  const handlePinClose = () => {
+    setCurrentPinId(null);
+    setIsEditing(false);
   };
 
   return (
@@ -47,8 +59,8 @@ const Pin = ({ pin, viewport, setViewport, currentPinId, setCurrentPinId }) => {
           latitude={latitude}
           longitude={longitude}
           closeButton={true}
-          closeOnClick={true}
-          onClose={() => setCurrentPinId(null)}
+          closeOnClick={isEditing ? false : true}
+          onClose={handlePinClose}
           anchor="left"
         >
           {!isEditing && (
@@ -98,7 +110,14 @@ const Pin = ({ pin, viewport, setViewport, currentPinId, setCurrentPinId }) => {
               </ButtonWrapper>
             </Wrapper>
           )}
-          {isEditing && <EditPin pin={pin} />}
+          {isEditing && (
+            <EditPin
+              pin={pin}
+              setLoading={setLoading}
+              setCurrentPinId={setCurrentPinId}
+              setIsEditing={setIsEditing}
+            />
+          )}
         </Popup>
       )}
     </Container>

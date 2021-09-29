@@ -5,14 +5,15 @@ import LocalizationProvider from "@mui/lab/LocalizationProvider";
 import DesktopDatePicker from "@mui/lab/DesktopDatePicker";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import { Room } from "@mui/icons-material";
+import { Room, DeleteForever } from "@mui/icons-material";
+import { toast } from "react-toastify";
 
-const EditPin = ({ pin }) => {
+const EditPin = ({ pin, setLoading, setCurrentPinId, setIsEditing }) => {
   const [selectedDate, setSelectedDate] = useState(pin.date);
   const [images, setImages] = useState(pin.photos);
-  const [imageUrls, setImageUrls] = useState(null);
-  const [deletedImages, setDeletedImage] = useState(null);
-  const [addedImages, setAddedImage] = useState(null);
+  const [addedImageUrls, setAddedImageUrls] = useState(null);
+  const [deletedImages, setDeletedImages] = useState([]);
+  const [addedImages, setAddedImages] = useState([]);
   const [isEmpty, setIsEmpty] = useState(false);
   const [values, setValues] = useState({
     location: pin.location,
@@ -24,19 +25,36 @@ const EditPin = ({ pin }) => {
   const handleDateChange = (newDate) => setSelectedDate(newDate);
 
   const handleImageChange = (e) => {
-    const selectedImages = Object.values(e.target.files);
-    setImages(selectedImages);
-    //   Object.values(e.target.files).forEach((file) => console.log(file.name));
+    // convert Filelist object to array and update in images state
+    const imageFiles = [...e.target.files];
+    // check images size
+    const bigImages = imageFiles.filter((file) => file.size > 1024 * 5000);
+
+    if (bigImages.length > 0) {
+      toast("The maximum size for each image is 5MB.");
+    } else {
+      setAddedImages([...imageFiles]);
+    }
   };
 
-  // useEffect(() => {
-  //   if (images) {
-  //     const urls = images.map((image) => URL.createObjectURL(image));
-  //     setImageUrls(urls);
-  //   }
-  // }, [images]);
+  const handleImageDelete = (e) => {
+    const imageId = e.target.closest("div").previousSibling.id;
+    // using != below as imageId is a string and the other is a number
+    const newImages = images.filter((image) => image.id != imageId);
+    const newDeletedImage = images.filter((image) => image.id == imageId)[0];
+    setImages(newImages);
+    setDeletedImages([...deletedImages, newDeletedImage]);
+    console.log(deletedImages);
+  };
 
-  const handleChange = (e) => {
+  useEffect(() => {
+    if (addedImages.length > 0) {
+      const urls = addedImages.map((image) => URL.createObjectURL(image));
+      setAddedImageUrls(urls);
+    }
+  }, [addedImages]);
+
+  const handleValueChange = (e) => {
     setIsEmpty(false);
     const { name, value } = e.target;
     setValues({ ...values, [name]: value });
@@ -46,48 +64,62 @@ const EditPin = ({ pin }) => {
     e.preventDefault();
 
     // validate location field
-    const hasLocation = values.location === "";
-
-    if (hasLocation) {
+    if (values.location === "") {
       setIsEmpty(true);
-    } else {
-      const submitValues = { ...values, date: selectedDate };
+      return;
+    }
 
-      const res = await fetch(`http://localhost:1337/pins/${pin.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(submitValues),
-      });
+    setLoading(true);
 
-      if (!res.ok) {
-        throw Error("Failed to upload data, please try again later.");
-      } else {
-        const data = await res.json();
+    const submitValues = { ...values, date: selectedDate };
+    const res = await fetch(`${process.env.REACT_APP_API_URL}/pins/${pin.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(submitValues),
+    });
+    if (!res.ok) {
+      toast("Network error. Please try again later.");
+      setLoading(false);
+      return;
+    }
 
-        const response = await fetch(`http://localhost:1337/upload/files/3`, {
+    deletedImages.forEach((image) => {
+      const deleteRes = fetch(
+        `${process.env.REACT_APP_API_URL}/upload/files/${image.id}`,
+        {
           method: "DELETE",
-        });
+        }
+      );
+      if (!deleteRes.ok) {
+        toast("Network error. Failed to amend photos, please try again later.");
+        setLoading(false);
+        return;
+      }
+    });
 
-        // if (images) {
-        //   const formData = new FormData();
-        //   formData.append("ref", "pins");
-        //   formData.append("refId", data.id);
-        //   formData.append("field", "photos");
-        //   images.forEach((image) =>
-        //     formData.append(`files`, image, image.name)
-        //   );
+    if (addedImages.length > 0) {
+      const formData = new FormData();
+      formData.append("ref", "pins");
+      formData.append("refId", pin.id);
+      formData.append("field", "photos");
+      addedImages.forEach((image) =>
+        formData.append(`files`, image, image.name)
+      );
 
-        //   const res = await fetch("http://localhost:1337/upload", {
-        //     method: "POST",
-        //     body: formData,
-        //   });
-
-        //   if (res.ok) {
-        //     console.log("images uploaded");
-        //   }
-        // }
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/upload`, {
+        method: "POST",
+        body: formData,
+      });
+      if (!res.ok) {
+        toast("Network error. Failed to amend photos, please try again later.");
+        setLoading(false);
+        return;
       }
     }
+
+    setLoading(false);
+    setCurrentPinId(null);
+    setIsEditing(false);
   };
 
   return (
@@ -105,7 +137,7 @@ const EditPin = ({ pin }) => {
           label="Location"
           name="location"
           value={values.location}
-          onChange={handleChange}
+          onChange={handleValueChange}
         />
         <LocalizationProvider dateAdapter={AdapterDateFns}>
           <DesktopDatePicker
@@ -123,17 +155,29 @@ const EditPin = ({ pin }) => {
           label="Description"
           name="description"
           value={values.description}
-          onChange={handleChange}
+          onChange={handleValueChange}
         />
-        <PhotosWrapper>
-          {/* {images && (
+        <PhotosContainer>
+          {images && (
             <PhotosGrid>
               {images.map((photo) => (
-                <Photo src={photo.formats.thumbnail.url} />
+                <PhotoWrapper key={photo.id}>
+                  <Photo id={photo.id} src={photo.formats.thumbnail.url} />
+                  <div>
+                    <DeleteForever
+                      color="warning"
+                      onClick={handleImageDelete}
+                    />
+                  </div>
+                </PhotoWrapper>
               ))}
+              {addedImageUrls &&
+                addedImageUrls.map((url, index) => (
+                  <Photo key={index} src={url} />
+                ))}
             </PhotosGrid>
-          )} */}
-
+          )}
+          <p>The maximum image size is 5MB.</p>
           <label htmlFor="contained-button-file">
             <Input
               accept="image/*"
@@ -148,10 +192,10 @@ const EditPin = ({ pin }) => {
               size="small"
               color="warning"
             >
-              Add Photos
+              {!addedImageUrls ? "Add Photos" : "Change Photos"}
             </Button>
           </label>
-        </PhotosWrapper>
+        </PhotosContainer>
         <Button variant="contained" color="primary" type="submit">
           Confirm
         </Button>
@@ -162,7 +206,10 @@ const EditPin = ({ pin }) => {
 
 export default EditPin;
 
-const Container = styled.div``;
+const Container = styled.div`
+  cursor: initial;
+  width: 400px;
+`;
 
 const Title = styled.div`
   display: flex;
@@ -176,7 +223,7 @@ const Form = styled.form`
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 400px;
+  width: 100%;
 
   .MuiTextField-root {
     width: 95%;
@@ -188,7 +235,7 @@ const Form = styled.form`
   }
 `;
 
-const PhotosWrapper = styled.div`
+const PhotosContainer = styled.div`
   border: 1px solid #bdbdbd;
   border-radius: 4px;
   width: 95%;
@@ -204,6 +251,12 @@ const PhotosWrapper = styled.div`
   label {
     margin: auto;
   }
+
+  p {
+    text-align: center;
+    color: #bdbdbd;
+    font-size: 14px;
+  }
 `;
 
 const PhotosGrid = styled.div`
@@ -213,12 +266,43 @@ const PhotosGrid = styled.div`
   grid-gap: 4px;
 `;
 
-const Input = styled("input")({
-  display: "none",
-});
+const PhotoWrapper = styled.div`
+  position: relative;
+  width: 100%;
+  height: 47.69px;
+
+  div {
+    position: absolute;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-color: rgba(255, 255, 255, 0.7);
+    display: none;
+
+    svg {
+      cursor: pointer;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+  }
+
+  :hover {
+    div {
+      display: block;
+    }
+  }
+`;
 
 const Photo = styled.img`
   width: 100%;
   height: 47.69px;
   object-fit: cover;
 `;
+
+const Input = styled("input")({
+  display: "none",
+});
