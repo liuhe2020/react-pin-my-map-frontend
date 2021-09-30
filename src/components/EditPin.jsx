@@ -38,13 +38,11 @@ const EditPin = ({ pin, setLoading, setCurrentPinId, setIsEditing }) => {
   };
 
   const handleImageDelete = (e) => {
-    const imageId = e.target.closest("div").previousSibling.id;
-    // using != below as imageId is a string and the other is a number
-    const newImages = images.filter((image) => image.id != imageId);
-    const newDeletedImage = images.filter((image) => image.id == imageId)[0];
+    const imageId = Number(e.target.closest("div").previousSibling.id);
+    const newImages = images.filter((image) => image.id !== imageId);
+    const newDeletedImage = images.filter((image) => image.id === imageId)[0];
     setImages(newImages);
     setDeletedImages([...deletedImages, newDeletedImage]);
-    console.log(deletedImages);
   };
 
   useEffect(() => {
@@ -71,32 +69,51 @@ const EditPin = ({ pin, setLoading, setCurrentPinId, setIsEditing }) => {
 
     setLoading(true);
 
+    const allResponses = await Promise.all([
+      amendValues(),
+      ...deleteImages(),
+      ...addImages(),
+    ]);
+    const allFailed = allResponses.filter((res) => !res.ok);
+
+    if (allFailed.length > 0) {
+      setLoading(false);
+      toast("Network error. Failed to amend photos, please try again later.");
+    } else {
+      setCurrentPinId(null);
+      setIsEditing(false);
+      setLoading(false);
+    }
+  };
+
+  const amendValues = () => {
     const submitValues = { ...values, date: selectedDate };
-    const res = await fetch(`${process.env.REACT_APP_API_URL}/pins/${pin.id}`, {
+    const res = fetch(`${process.env.REACT_APP_API_URL}/pins/${pin.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(submitValues),
     });
-    if (!res.ok) {
-      toast("Network error. Please try again later.");
-      setLoading(false);
-      return;
+    return res;
+  };
+
+  const deleteImages = () => {
+    if (deletedImages.length > 0) {
+      const res = deletedImages.map((image) => {
+        const singleRes = fetch(
+          `${process.env.REACT_APP_API_URL}/upload/files/${image.id}`,
+          {
+            method: "DELETE",
+          }
+        );
+        return singleRes;
+      });
+      return res;
+    } else {
+      return [];
     }
+  };
 
-    deletedImages.forEach((image) => {
-      const deleteRes = fetch(
-        `${process.env.REACT_APP_API_URL}/upload/files/${image.id}`,
-        {
-          method: "DELETE",
-        }
-      );
-      if (!deleteRes.ok) {
-        toast("Network error. Failed to amend photos, please try again later.");
-        setLoading(false);
-        return;
-      }
-    });
-
+  const addImages = () => {
     if (addedImages.length > 0) {
       const formData = new FormData();
       formData.append("ref", "pins");
@@ -105,21 +122,14 @@ const EditPin = ({ pin, setLoading, setCurrentPinId, setIsEditing }) => {
       addedImages.forEach((image) =>
         formData.append(`files`, image, image.name)
       );
-
-      const res = await fetch(`${process.env.REACT_APP_API_URL}/upload`, {
+      const res = fetch(`${process.env.REACT_APP_API_URL}/upload`, {
         method: "POST",
         body: formData,
       });
-      if (!res.ok) {
-        toast("Network error. Failed to amend photos, please try again later.");
-        setLoading(false);
-        return;
-      }
+      return [res];
+    } else {
+      return [];
     }
-
-    setLoading(false);
-    setCurrentPinId(null);
-    setIsEditing(false);
   };
 
   return (
