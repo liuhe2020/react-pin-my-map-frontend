@@ -2,7 +2,7 @@ import styled from "styled-components";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 
-const LoginPage = () => {
+const Register = () => {
   return (
     <Container>
       <Form>
@@ -38,7 +38,7 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default Register;
 
 const Container = styled.div``;
 

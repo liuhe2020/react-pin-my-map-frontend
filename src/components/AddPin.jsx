@@ -21,6 +21,12 @@ const AddPin = ({ newCoord, setNewCoord, setLoading }) => {
     longitude: newCoord.long,
   });
 
+  const handleValueChange = (e) => {
+    setIsEmpty(false);
+    const { name, value } = e.target;
+    setValues({ ...values, [name]: value });
+  };
+
   const handleDateChange = (newDate) => setSelectedDate(newDate);
 
   const handleImageChange = (e) => {
@@ -42,12 +48,6 @@ const AddPin = ({ newCoord, setNewCoord, setLoading }) => {
       setImageUrls(urls);
     }
   }, [images]);
-
-  const handleValueChange = (e) => {
-    setIsEmpty(false);
-    const { name, value } = e.target;
-    setValues({ ...values, [name]: value });
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
