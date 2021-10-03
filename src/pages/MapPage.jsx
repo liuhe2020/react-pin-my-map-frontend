@@ -2,9 +2,7 @@ import styled from "styled-components";
 import { useState, useEffect } from "react";
 import ReactMapGL, { Popup } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import SyncLoader from "react-spinners/SyncLoader";
+
 import Pin from "../components/Pin";
 import AddPin from "../components/AddPin";
 
@@ -77,36 +75,8 @@ const MapPage = () => {
           />
         </Popup>
       )}
-      {loading && (
-        <LoaderOverlay>
-          <SyncLoader color="#ed6c02" loading={loading} />
-        </LoaderOverlay>
-      )}
-      <ToastContainer
-        position="top-left"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-      />
     </ReactMapGL>
   );
 };
 
 export default MapPage;
-
-const LoaderOverlay = styled.div`
-  position: absolute;
-  z-index: 10;
-  display: grid;
-  place-items: center;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  background-color: rgba(250, 250, 250, 0.7);
-`;
