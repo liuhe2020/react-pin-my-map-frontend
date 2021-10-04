@@ -6,23 +6,21 @@ import { Room, Today, TextSnippet } from "@mui/icons-material";
 import Button from "@mui/material/Button";
 import ImageGallery from "react-image-gallery";
 import "react-image-gallery/styles/css/image-gallery.css";
+
 import EditPin from "./EditPin";
 
-const Pin = ({
-  pin,
-  viewport,
-  setViewport,
-  currentPinId,
-  setCurrentPinId,
-  setLoading,
-}) => {
+const Pin = ({ pin, viewport, setViewport, currentPinId, setCurrentPinId }) => {
   const [isEditing, setIsEditing] = useState(false);
+
   const { id, location, date, latitude, longitude, description, photos } = pin;
+
   const photoUrls = photos.map((photo) => ({
     thumbnail: photo.formats.thumbnail.url,
     original: photo.url,
   }));
 
+  // show popup when marker is clicked and "attach" the popup to related marker
+  // transition properties are for animation when jumping from one pin to another
   const handleMarkerClick = (id, latitude, longitude) => {
     setCurrentPinId(id);
     setViewport({
@@ -35,6 +33,7 @@ const Pin = ({
     });
   };
 
+  // close popup when clicked outside (disabled while editing pin)
   const handlePinClose = () => {
     setCurrentPinId(null);
     setIsEditing(false);
@@ -45,11 +44,11 @@ const Pin = ({
       <Marker
         latitude={latitude}
         longitude={longitude}
-        offsetLeft={-viewport.zoom * 3.5}
-        offsetTop={-viewport.zoom * 7}
+        offsetLeft={-viewport.zoom * 3.5} //centering marker
+        offsetTop={-viewport.zoom * 7} //centering marker
       >
         <Room
-          style={{ fontSize: viewport.zoom * 7, cursor: "pointer" }}
+          style={{ fontSize: viewport.zoom * 7, cursor: "pointer" }} //scaling marker size with zoom
           color="warning"
           onClick={() => handleMarkerClick(id, latitude, longitude)}
         />
@@ -113,7 +112,6 @@ const Pin = ({
           {isEditing && (
             <EditPin
               pin={pin}
-              setLoading={setLoading}
               setCurrentPinId={setCurrentPinId}
               setIsEditing={setIsEditing}
             />

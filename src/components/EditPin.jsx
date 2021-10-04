@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import styled from "styled-components";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
@@ -8,7 +8,9 @@ import Button from "@mui/material/Button";
 import { Room, DeleteForever } from "@mui/icons-material";
 import { toast } from "react-toastify";
 
-const EditPin = ({ pin, setLoading, setCurrentPinId, setIsEditing }) => {
+import GlobalContext from "../context/GlobalContext";
+
+const EditPin = ({ pin, setCurrentPinId, setIsEditing }) => {
   const [selectedDate, setSelectedDate] = useState(pin.date);
   const [images, setImages] = useState(pin.photos);
   const [addedImageUrls, setAddedImageUrls] = useState(null);
@@ -22,16 +24,18 @@ const EditPin = ({ pin, setLoading, setCurrentPinId, setIsEditing }) => {
     longitude: pin.longitude,
   });
 
+  const { setIsLoading, authUser, getPins } = useContext(GlobalContext);
+
   const handleDateChange = (newDate) => setSelectedDate(newDate);
 
   const handleImageChange = (e) => {
     // convert Filelist object to array and update in images state
     const imageFiles = [...e.target.files];
     // check images size
-    const bigImages = imageFiles.filter((file) => file.size > 1024 * 5000);
+    const bigImages = imageFiles.filter((file) => file.size > 1024 * 1000);
 
     if (bigImages.length > 0) {
-      toast("The maximum size for each image is 5MB.");
+      toast("The maximum size for each image is 1MB.");
     } else {
       setAddedImages([...imageFiles]);
     }
@@ -58,39 +62,14 @@ const EditPin = ({ pin, setLoading, setCurrentPinId, setIsEditing }) => {
     setValues({ ...values, [name]: value });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    // validate location field
-    if (values.location === "") {
-      setIsEmpty(true);
-      return;
-    }
-
-    setLoading(true);
-
-    const allResponses = await Promise.all([
-      amendValues(),
-      ...deleteImages(),
-      ...addImages(),
-    ]);
-    const allFailed = allResponses.filter((res) => !res.ok);
-
-    if (allFailed.length > 0) {
-      setLoading(false);
-      toast("Network error. Failed to amend photos, please try again later.");
-    } else {
-      setCurrentPinId(null);
-      setIsEditing(false);
-      setLoading(false);
-    }
-  };
-
   const amendValues = () => {
     const submitValues = { ...values, date: selectedDate };
     const res = fetch(`${process.env.REACT_APP_API_URL}/pins/${pin.id}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${authUser.jwt}`,
+      },
       body: JSON.stringify(submitValues),
     });
     return res;
@@ -103,6 +82,7 @@ const EditPin = ({ pin, setLoading, setCurrentPinId, setIsEditing }) => {
           `${process.env.REACT_APP_API_URL}/upload/files/${image.id}`,
           {
             method: "DELETE",
+            headers: { Authorization: `Bearer ${authUser.jwt}` },
           }
         );
         return singleRes;
@@ -124,12 +104,43 @@ const EditPin = ({ pin, setLoading, setCurrentPinId, setIsEditing }) => {
       );
       const res = fetch(`${process.env.REACT_APP_API_URL}/upload`, {
         method: "POST",
+        headers: { Authorization: `Bearer ${authUser.jwt}` },
         body: formData,
       });
       return [res];
     } else {
       return [];
     }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // validate location field
+    if (values.location === "") {
+      setIsEmpty(true);
+      return;
+    }
+
+    setIsLoading(true);
+
+    const allResponses = await Promise.all([
+      amendValues(),
+      ...deleteImages(),
+      ...addImages(),
+    ]);
+    const hasFailedResponse = allResponses.some((res) => res.status !== 200);
+
+    if (hasFailedResponse) {
+      toast("Network error. Failed to update the pin, please try again later.");
+    } else {
+      getPins();
+      setCurrentPinId(null);
+      setIsEditing(false);
+      toast(`${values.location} - Updated`);
+    }
+
+    setIsLoading(false);
   };
 
   return (

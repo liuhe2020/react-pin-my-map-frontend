@@ -1,14 +1,16 @@
 import styled from "styled-components";
-import { useState, useEffect } from "react";
+import { useState, useContext } from "react";
 import ReactMapGL, { Popup } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 import Pin from "../components/Pin";
 import AddPin from "../components/AddPin";
+import Loader from "../components/Loader";
+import GlobalContext from "../context/GlobalContext";
 
 const MapPage = () => {
-  const [loading, setLoading] = useState(false);
-  const [pins, setPins] = useState(null);
+  const { pins, isLoading } = useContext(GlobalContext);
+
   const [currentPinId, setCurrentPinId] = useState(null);
   const [newCoord, setNewCoord] = useState(null);
   const [viewport, setViewport] = useState({
@@ -19,24 +21,11 @@ const MapPage = () => {
     zoom: 4,
   });
 
+  // create a new marker & popup at clicked location
   const handleMapDblClick = (e) => {
     const [long, lat] = e.lngLat;
     setNewCoord({ lat, long });
   };
-
-  // re-run effect @newCoord when a new pin is added
-  useEffect(() => {
-    const getPins = async () => {
-      const res = await fetch(`${process.env.REACT_APP_API_URL}/pins`);
-      if (!res.ok) {
-        toast("Network error. Please try again later.");
-      } else {
-        const pins = await res.json();
-        setPins(pins);
-      }
-    };
-    getPins();
-  }, [loading]);
 
   return (
     <ReactMapGL
@@ -55,7 +44,6 @@ const MapPage = () => {
             setViewport={setViewport}
             currentPinId={currentPinId}
             setCurrentPinId={setCurrentPinId}
-            setLoading={setLoading}
           />
         ))}
       {newCoord && (
@@ -67,14 +55,10 @@ const MapPage = () => {
           onClose={() => setNewCoord(null)}
           anchor="left"
         >
-          <AddPin
-            newCoord={newCoord}
-            setNewCoord={setNewCoord}
-            setPins={setPins}
-            setLoading={setLoading}
-          />
+          <AddPin newCoord={newCoord} setNewCoord={setNewCoord} />
         </Popup>
       )}
+      {isLoading && <Loader />}
     </ReactMapGL>
   );
 };

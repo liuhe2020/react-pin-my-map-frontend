@@ -1,17 +1,24 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import styled from "styled-components";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
+import { toast } from "react-toastify";
+
+import Loader from "../components/Loader";
+import GlobalContext from "../context/GlobalContext";
 
 const Login = () => {
-  const [isEmpty, setIsEmpty] = useState(false);
+  const { isLoading, setIsLoading } = useContext(GlobalContext);
+  const [hasEmail, setHasEmail] = useState(true);
+  const [hasPassword, setHasPassword] = useState(true);
   const [loginCreds, setLoginCreds] = useState({
     identifier: "",
     password: "",
   });
 
   const handleChange = (e) => {
-    setIsEmpty(false);
+    setHasEmail(true);
+    setHasPassword(true);
     const { name, value } = e.target;
     setLoginCreds({ ...loginCreds, [name]: value });
   };
@@ -20,20 +27,32 @@ const Login = () => {
     e.preventDefault();
 
     // validate form - no empty fields
-    if (loginCreds.identifier === "" || loginCreds.password === "") {
-      setIsEmpty(true);
+    if (loginCreds.identifier === "") {
+      setHasEmail(false);
       return;
     }
+
+    if (loginCreds.password === "") {
+      setHasPassword(false);
+      return;
+    }
+
+    setIsLoading(true);
 
     const res = await fetch(`${process.env.REACT_APP_API_URL}/auth/local`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(loginCreds),
-      // credentials: "include",
     });
 
-    const data = await res.json();
-    console.log(data);
+    if (res.status !== 200) {
+      toast("Failed to log in, please try again.");
+      setIsLoading(false);
+    } else {
+      const data = await res.json();
+      localStorage.setItem("pin-my-map-user", JSON.stringify(data));
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -47,8 +66,8 @@ const Login = () => {
           variant="outlined"
           color="warning"
           onChange={handleChange}
-          error={isEmpty && true}
-          helperText={isEmpty && "Email address is required."}
+          error={!hasEmail && true}
+          helperText={!hasEmail && "Email address is required."}
         />
         <TextField
           id="outlined-basic"
@@ -58,13 +77,14 @@ const Login = () => {
           variant="outlined"
           color="warning"
           onChange={handleChange}
-          error={isEmpty && true}
-          helperText={isEmpty && "Password is required."}
+          error={!hasPassword && true}
+          helperText={!hasPassword && "Password is required."}
         />
         <Button variant="contained" color="warning" onClick={handleSubmit}>
           Log in
         </Button>
       </Form>
+      {isLoading && <Loader />}
     </Container>
   );
 };
