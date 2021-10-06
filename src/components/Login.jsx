@@ -4,11 +4,10 @@ import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import { toast } from "react-toastify";
 
-import Loader from "../components/Loader";
 import GlobalContext from "../context/GlobalContext";
 
-const Login = () => {
-  const { isLoading, setIsLoading } = useContext(GlobalContext);
+const Login = ({ setIsRegister }) => {
+  const { setAuthUser, setIsLoading } = useContext(GlobalContext);
   const [hasEmail, setHasEmail] = useState(true);
   const [hasPassword, setHasPassword] = useState(true);
   const [loginCreds, setLoginCreds] = useState({
@@ -47,20 +46,22 @@ const Login = () => {
 
     if (res.status !== 200) {
       toast("Failed to log in, please try again.");
-      setIsLoading(false);
     } else {
       const data = await res.json();
       localStorage.setItem("pin-my-map-user", JSON.stringify(data));
-      setIsLoading(false);
+      setAuthUser(data);
     }
+
+    setIsLoading(false);
   };
 
   return (
     <Container>
+      <h1>Account Login</h1>
       <Form>
         <TextField
-          id="outlined-basic"
-          label="Email address"
+          id="outlined-password-input"
+          label="Username or email address"
           name="identifier"
           value={loginCreds.identifier}
           variant="outlined"
@@ -71,6 +72,8 @@ const Login = () => {
         />
         <TextField
           id="outlined-basic"
+          type="password"
+          autoComplete="current-password"
           label="Password"
           name="password"
           value={loginCreds.password}
@@ -80,18 +83,41 @@ const Login = () => {
           error={!hasPassword && true}
           helperText={!hasPassword && "Password is required."}
         />
-        <Button variant="contained" color="warning" onClick={handleSubmit}>
+        <Button
+          variant="contained"
+          color="warning"
+          style={{ width: "100%" }}
+          onClick={handleSubmit}
+        >
           Log in
         </Button>
+        <BreakLine />
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => setIsRegister(true)}
+        >
+          Register
+        </Button>
       </Form>
-      {isLoading && <Loader />}
     </Container>
   );
 };
 
 export default Login;
 
-const Container = styled.div``;
+const Container = styled.div`
+  width: 300px;
+  box-shadow: rgba(0, 0, 0, 0.08) 0px 4px 12px;
+  padding: 40px;
+
+  h1 {
+    color: #ed6c02;
+    font-size: 26px;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+`;
 
 const Form = styled.form`
   display: flex;
@@ -99,7 +125,18 @@ const Form = styled.form`
   align-items: center;
 
   .MuiTextField-root {
+    width: 100%;
     margin: 15px 0;
-    width: 40ch;
   }
+
+  .MuiButton-root {
+    margin-top: 12px;
+  }
+`;
+
+const BreakLine = styled.span`
+  width: 100%;
+  height: 1px;
+  background-color: #bdbdbd;
+  margin: 24px 0 8px;
 `;
