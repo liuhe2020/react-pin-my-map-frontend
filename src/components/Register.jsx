@@ -156,7 +156,8 @@ export default Register;
 const Container = styled.div`
   width: 300px;
   box-shadow: rgba(0, 0, 0, 0.08) 0px 4px 12px;
-  padding: 40px;
+  padding: 30px;
+  background-color: #fff;
 
   h1 {
     color: #ed6c02;

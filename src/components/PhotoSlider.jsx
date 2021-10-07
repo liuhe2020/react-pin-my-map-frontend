@@ -3,7 +3,6 @@ import styled from "styled-components";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import FsLightbox from "fslightbox-react";
 
 import Lightbox from "./Lightbox";
 
@@ -54,8 +53,9 @@ const PhotoSlider = ({ photos }) => {
               />
             </PhotoWrapper>
           ))}
-          <PhotoWrapper></PhotoWrapper>
-          <PhotoWrapper></PhotoWrapper>
+          {/* slick slider needs 3 div/img minimum to work */}
+          {photoUrls.length < 3 && <PhotoWrapper />}
+          {photoUrls.length < 3 && <PhotoWrapper />}
         </Slider>
         <Lightbox
           lightboxController={lightboxController}
