@@ -62,7 +62,6 @@ const MapPage = () => {
             closeButton={true}
             closeOnClick={false}
             onClose={() => setNewCoord(null)}
-            anchor="left"
           >
             <AddPin newCoord={newCoord} setNewCoord={setNewCoord} />
           </Popup>

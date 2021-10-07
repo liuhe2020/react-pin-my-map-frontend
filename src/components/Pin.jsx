@@ -4,20 +4,13 @@ import { Marker, Popup, FlyToInterpolator } from "react-map-gl";
 import { easeCubic } from "d3-ease";
 import { Room, Today, TextSnippet } from "@mui/icons-material";
 import Button from "@mui/material/Button";
-import ImageGallery from "react-image-gallery";
-import "react-image-gallery/styles/css/image-gallery.css";
 
 import EditPin from "./EditPin";
+import PhotoSlider from "./PhotoSlider";
 
 const Pin = ({ pin, viewport, setViewport, currentPinId, setCurrentPinId }) => {
   const [isEditing, setIsEditing] = useState(false);
-
   const { id, location, date, latitude, longitude, description, photos } = pin;
-
-  const photoUrls = photos.map((photo) => ({
-    thumbnail: photo.formats.thumbnail.url,
-    original: photo.url,
-  }));
 
   // show popup when marker is clicked and "attach" the popup to related marker
   // transition properties are for animation when jumping from one pin to another
@@ -60,17 +53,13 @@ const Pin = ({ pin, viewport, setViewport, currentPinId, setCurrentPinId }) => {
           closeButton={true}
           closeOnClick={isEditing ? false : true}
           onClose={handlePinClose}
-          anchor="left"
+          captureScroll={true}
+          offsetTop={-viewport.zoom * 4} //adjust offset to marker
+          offsetLeft={viewport.zoom * 3} //adjust offset to marker
         >
           {!isEditing && (
             <Wrapper>
-              {photoUrls && (
-                <ImageGallery
-                  items={photoUrls}
-                  thumbnailPosition="right"
-                  showPlayButton={false}
-                />
-              )}
+              {photos.length > 0 && <PhotoSlider photos={photos} />}
               <Line>
                 <Room color="warning" />
                 <label>Location</label>
@@ -143,7 +132,7 @@ const Wrapper = styled.div`
   h3,
   h4,
   p {
-    margin: 3px 0 15px 0;
+    margin: 3px 0 15px 26px;
     padding-left: 3px;
     color: #212121;
   }
