@@ -1,19 +1,21 @@
+import { useParams } from "react-router";
+import { useHistory } from "react-router-dom";
 import styled from "styled-components";
-import { useState, useContext } from "react";
-import { Redirect } from "react-router-dom";
+import { useState, useEffect, useContext } from "react";
 import ReactMapGL, { Popup } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import Button from "@mui/material/Button";
-import { ExitToApp } from "@mui/icons-material";
+import { toast } from "react-toastify";
 
-import GlobalContext from "../context/GlobalContext";
-import Pin from "../components/Pin";
-import AddPin from "../components/AddPin";
+import UserPin from "../components/UserPin";
 import Loader from "../components/Loader";
-import SocialShare from "../components/SocialShare";
+import GlobalContext from "../context/GlobalContext";
 
-const MapPage = () => {
-  const { pins, authUser, setAuthUser, isLoading } = useContext(GlobalContext);
+const UserMapPage = () => {
+  const history = useHistory();
+  const { id } = useParams();
+  const { isLoading, setIsLoading } = useContext(GlobalContext);
+  const [pins, setPins] = useState(null);
   const [currentPinId, setCurrentPinId] = useState(null);
   const [newCoord, setNewCoord] = useState(null);
   const [viewport, setViewport] = useState({
@@ -24,18 +26,26 @@ const MapPage = () => {
     zoom: 4,
   });
 
-  if (!authUser) return <Redirect to="/" />;
-
-  // create a new marker & popup at clicked location
-  const handleMapDblClick = (e) => {
-    const [long, lat] = e.lngLat;
-    setNewCoord({ lat, long });
+  const handleSignUp = () => {
+    history.push("/");
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("pin-my-map-user");
-    setAuthUser(null);
-  };
+  useEffect(() => {
+    const getPins = async () => {
+      setIsLoading(true);
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/users/${id}`);
+      if (res.status !== 200) {
+        setIsLoading(false);
+        history.push("/");
+        toast.error("Network error. Please try again later.");
+      } else {
+        const user = await res.json();
+        setPins(user.pins);
+        setIsLoading(false);
+      }
+    };
+    getPins();
+  }, [id, setIsLoading, history]);
 
   return (
     <Container>
@@ -44,11 +54,10 @@ const MapPage = () => {
         mapboxApiAccessToken={process.env.REACT_APP_MAPBOX}
         onViewportChange={(nextViewport) => setViewport(nextViewport)}
         mapStyle="mapbox://styles/liuhe2020/cktu2h4q70wil17m6umh33a9i"
-        onDblClick={handleMapDblClick}
       >
         {pins &&
           pins.map((pin) => (
-            <Pin
+            <UserPin
               key={pin.id}
               pin={pin}
               viewport={viewport}
@@ -64,41 +73,25 @@ const MapPage = () => {
             closeButton={true}
             closeOnClick={false}
             onClose={() => setNewCoord(null)}
-          >
-            <AddPin newCoord={newCoord} setNewCoord={setNewCoord} />
-          </Popup>
+          ></Popup>
         )}
         {isLoading && <Loader />}
       </ReactMapGL>
-      <ButtonWrapper>
-        <Button
-          variant="contained"
-          size="small"
-          color="warning"
-          onClick={handleLogout}
-        >
-          <ExitToApp style={{ fontSize: "20px", marginRight: "3px" }} />
-          Log out
-        </Button>
-        <SocialShare id={authUser.user.id} />
-      </ButtonWrapper>
+      <Button
+        variant="contained"
+        size="small"
+        color="warning"
+        style={{ position: "absolute", top: "15px", left: "15px" }}
+        onClick={handleSignUp}
+      >
+        Sign Up
+      </Button>
     </Container>
   );
 };
 
-export default MapPage;
+export default UserMapPage;
 
 const Container = styled.div`
   position: relative;
-`;
-
-const ButtonWrapper = styled.div`
-  position: absolute;
-  display: flex;
-  top: 10px;
-  left: 10px;
-
-  button {
-    margin: 5px;
-  }
 `;

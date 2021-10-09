@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import styled from "styled-components";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
@@ -8,7 +8,11 @@ import Button from "@mui/material/Button";
 import { Room } from "@mui/icons-material";
 import { toast } from "react-toastify";
 
-const AddPin = ({ newCoord, setNewCoord, setLoading }) => {
+import GlobalContext from "../context/GlobalContext";
+
+const AddPin = ({ newCoord, setNewCoord }) => {
+  const { setIsLoading, authUser, getPins } = useContext(GlobalContext);
+
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [images, setImages] = useState([]);
   const [imageUrls, setImageUrls] = useState(null);
@@ -19,6 +23,7 @@ const AddPin = ({ newCoord, setNewCoord, setLoading }) => {
     description: "",
     latitude: newCoord.lat,
     longitude: newCoord.long,
+    user: authUser.user.id,
   });
 
   const handleValueChange = (e) => {
@@ -33,15 +38,16 @@ const AddPin = ({ newCoord, setNewCoord, setLoading }) => {
     // convert Filelist object to array and update in images state
     const imageFiles = [...e.target.files];
     // check images size
-    const bigImages = imageFiles.filter((file) => file.size > 1024 * 5000);
+    const bigImages = imageFiles.filter((file) => file.size > 1024 * 1000);
 
     if (bigImages.length > 0) {
-      toast("The maximum size for each image is 5MB.");
+      toast.warn("The maximum size for each image is 1MB.");
     } else {
       setImages([...imageFiles]);
     }
   };
 
+  // use createObjectURL to generate urls locally for the Filelist
   useEffect(() => {
     if (images.length > 0) {
       const urls = images.map((image) => URL.createObjectURL(image));
@@ -58,7 +64,7 @@ const AddPin = ({ newCoord, setNewCoord, setLoading }) => {
       return;
     }
 
-    setLoading(true);
+    setIsLoading(true);
 
     const submitValues = { ...values, date: selectedDate };
     const formData = new FormData();
@@ -71,16 +77,19 @@ const AddPin = ({ newCoord, setNewCoord, setLoading }) => {
 
     const res = await fetch(`${process.env.REACT_APP_API_URL}/pins`, {
       method: "POST",
+      headers: { Authorization: `Bearer ${authUser.jwt}` },
       body: formData,
     });
 
-    if (res.ok) {
-      setNewCoord(null);
-      setLoading(false);
-      toast(`Pin added - ${submitValues.location}`);
+    if (res.status !== 200) {
+      toast.error("Network error. Please try again later.");
     } else {
-      toast("Network error. Please try again later.");
+      getPins();
+      setNewCoord(null);
+      toast.success(`${submitValues.location} - Added`);
     }
+
+    setIsLoading(false);
   };
 
   return (

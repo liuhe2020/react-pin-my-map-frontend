@@ -1,28 +1,23 @@
 import styled from "styled-components";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { Marker, Popup, FlyToInterpolator } from "react-map-gl";
 import { easeCubic } from "d3-ease";
 import { Room, Today, TextSnippet } from "@mui/icons-material";
 import Button from "@mui/material/Button";
-import ImageGallery from "react-image-gallery";
-import "react-image-gallery/styles/css/image-gallery.css";
+import { toast } from "react-toastify";
+
 import EditPin from "./EditPin";
+import PhotoSlider from "./PhotoSlider";
+import GlobalContext from "../context/GlobalContext";
 
-const Pin = ({
-  pin,
-  viewport,
-  setViewport,
-  currentPinId,
-  setCurrentPinId,
-  setLoading,
-}) => {
+const Pin = ({ pin, viewport, setViewport, currentPinId, setCurrentPinId }) => {
   const [isEditing, setIsEditing] = useState(false);
+  const [toggleDelete, setToggleDelete] = useState(false);
+  const { setIsLoading, authUser, getPins } = useContext(GlobalContext);
   const { id, location, date, latitude, longitude, description, photos } = pin;
-  const photoUrls = photos.map((photo) => ({
-    thumbnail: photo.formats.thumbnail.url,
-    original: photo.url,
-  }));
 
+  // show popup when marker is clicked and "attach" the popup to related marker
+  // transition properties are for animation when jumping from one pin to another
   const handleMarkerClick = (id, latitude, longitude) => {
     setCurrentPinId(id);
     setViewport({
@@ -35,9 +30,32 @@ const Pin = ({
     });
   };
 
+  // close popup when clicked outside (disabled while editing pin)
   const handlePinClose = () => {
     setCurrentPinId(null);
     setIsEditing(false);
+    setToggleDelete(false);
+  };
+
+  const handleDelete = async () => {
+    setIsLoading(true);
+
+    const res = await fetch(`${process.env.REACT_APP_API_URL}/pins/${id}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${authUser.jwt}` },
+    });
+
+    if (res.status !== 200) {
+      toast.error("Network error. Please try again later.");
+    } else {
+      getPins();
+      setCurrentPinId(null);
+      setIsEditing(false);
+      setToggleDelete(false);
+      toast.success(`${location} - Deleted`);
+    }
+
+    setIsLoading(false);
   };
 
   return (
@@ -45,11 +63,11 @@ const Pin = ({
       <Marker
         latitude={latitude}
         longitude={longitude}
-        offsetLeft={-viewport.zoom * 3.5}
-        offsetTop={-viewport.zoom * 7}
+        offsetLeft={-viewport.zoom * 3.5} //centering marker
+        offsetTop={-viewport.zoom * 7} //centering marker
       >
         <Room
-          style={{ fontSize: viewport.zoom * 7, cursor: "pointer" }}
+          style={{ fontSize: viewport.zoom * 7, cursor: "pointer" }} //scaling marker size with zoom
           color="warning"
           onClick={() => handleMarkerClick(id, latitude, longitude)}
         />
@@ -61,17 +79,14 @@ const Pin = ({
           closeButton={true}
           closeOnClick={isEditing ? false : true}
           onClose={handlePinClose}
+          captureScroll={true}
           anchor="left"
+          offsetTop={-viewport.zoom * 4} //adjust offset to marker
+          offsetLeft={viewport.zoom * 3} //adjust offset to marker
         >
           {!isEditing && (
             <Wrapper>
-              {photoUrls && (
-                <ImageGallery
-                  items={photoUrls}
-                  thumbnailPosition="right"
-                  showPlayButton={false}
-                />
-              )}
+              {photos.length > 0 && <PhotoSlider photos={photos} />}
               <Line>
                 <Room color="warning" />
                 <label>Location</label>
@@ -95,25 +110,54 @@ const Pin = ({
                   <p>{description}</p>
                 </>
               )}
-              <ButtonWrapper>
-                <Button
-                  variant="contained"
-                  size="small"
-                  color="primary"
-                  onClick={() => setIsEditing(true)}
-                >
-                  Edit
-                </Button>
-                <Button variant="contained" size="small" color="error">
-                  Delete
-                </Button>
-              </ButtonWrapper>
+              {authUser && (
+                <ButtonWrapper>
+                  <Button
+                    variant="contained"
+                    size="small"
+                    color="primary"
+                    onClick={() => setIsEditing(true)}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    variant="contained"
+                    size="small"
+                    color="error"
+                    onClick={() => setToggleDelete(true)}
+                  >
+                    Delete
+                  </Button>
+                </ButtonWrapper>
+              )}
+              {toggleDelete && (
+                <DeleteModal>
+                  <p>Are you sure you want to delete {location}?</p>
+                  <div>
+                    <Button
+                      variant="contained"
+                      size="small"
+                      color="error"
+                      onClick={handleDelete}
+                    >
+                      Delete
+                    </Button>
+                    <Button
+                      variant="contained"
+                      size="small"
+                      color="primary"
+                      onClick={() => setToggleDelete(false)}
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </DeleteModal>
+              )}
             </Wrapper>
           )}
           {isEditing && (
             <EditPin
               pin={pin}
-              setLoading={setLoading}
               setCurrentPinId={setCurrentPinId}
               setIsEditing={setIsEditing}
             />
@@ -133,6 +177,7 @@ const Container = styled.div`
 `;
 
 const Wrapper = styled.div`
+  position: relative;
   width: 400px;
   padding: 12px;
 
@@ -145,7 +190,7 @@ const Wrapper = styled.div`
   h3,
   h4,
   p {
-    margin: 3px 0 15px 0;
+    margin: 3px 0 0 26px;
     padding-left: 3px;
     color: #212121;
   }
@@ -185,12 +230,33 @@ const Line = styled.div`
   display: flex;
   align-items: center;
   color: #ed6c02;
+  margin-top: 15px;
 `;
 
 const ButtonWrapper = styled.div`
   text-align: center;
+  margin-top: 15px;
 
   button {
     margin: 5px;
+  }
+`;
+
+const DeleteModal = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 95%;
+  height: 100%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 1;
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  button {
+    margin: 10px 5px;
   }
 `;
