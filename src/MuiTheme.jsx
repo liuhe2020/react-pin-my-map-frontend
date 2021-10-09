@@ -3,7 +3,7 @@ import { createTheme } from "@mui/material/styles";
 const MuiTheme = createTheme({
   typography: {
     fontFamily: [
-      "Poppins",
+      "Rubik",
       "-apple-system",
       "BlinkMacSystemFont",
       '"Segoe UI"',

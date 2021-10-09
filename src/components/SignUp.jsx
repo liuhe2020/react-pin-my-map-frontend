@@ -154,7 +154,7 @@ const SignUp = ({ setIsSignUp }) => {
 export default SignUp;
 
 const Container = styled.div`
-  width: 300px;
+  width: 360px;
   box-shadow: rgba(0, 0, 0, 0.08) 0px 4px 12px;
   padding: 30px 35px;
   background-color: #fff;

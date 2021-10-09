@@ -20,8 +20,8 @@ const LoaderOverlay = styled.div`
   z-index: 10;
   display: grid;
   place-items: center;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
   top: 0;
   left: 0;
   background-color: rgba(250, 250, 250, 0.7);
