@@ -3,13 +3,13 @@ import { useState, useContext } from "react";
 import styled from "styled-components";
 
 import Login from "../components/Login";
-import Register from "../components/Register";
+import SignUp from "../components/SignUp";
 import Loader from "../components/Loader";
 import GlobalContext from "../context/GlobalContext";
 
 const HomePage = () => {
   const { isLoading, authUser } = useContext(GlobalContext);
-  const [isRegister, setIsRegister] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(false);
 
   if (authUser) return <Redirect to="/map" />;
 
@@ -21,10 +21,10 @@ const HomePage = () => {
         <h2>Record and share places that you have been.</h2>
       </TitleWrapper>
       <FormWrapper>
-        {isRegister ? (
-          <Register setIsRegister={setIsRegister} />
+        {isSignUp ? (
+          <SignUp setIsSignUp={setIsSignUp} />
         ) : (
-          <Login setIsRegister={setIsRegister} />
+          <Login setIsSignUp={setIsSignUp} />
         )}
       </FormWrapper>
       <Background src="./img/background.jpg" alt="pin_my_map_background" />

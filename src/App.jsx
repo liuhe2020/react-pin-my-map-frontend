@@ -3,9 +3,10 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import GlobalStyles from "./globalStyles";
+import { GlobalProvider } from "./context/GlobalContext";
 import HomePage from "./pages/HomePage";
 import MapPage from "./pages/MapPage";
-import { GlobalProvider } from "./context/GlobalContext";
+import UserMapPage from "./pages/UserMapPage";
 
 function App() {
   return (
@@ -15,6 +16,9 @@ function App() {
         <Switch>
           <Route path="/map">
             <MapPage />
+          </Route>
+          <Route path="/maps/:id">
+            <UserMapPage />
           </Route>
           <Route path="/">
             <HomePage />

@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 
 import GlobalContext from "../context/GlobalContext";
 
-const Login = ({ setIsRegister }) => {
+const Login = ({ setIsSignUp }) => {
   const { setAuthUser, setIsLoading } = useContext(GlobalContext);
   const [hasEmail, setHasEmail] = useState(true);
   const [hasPassword, setHasPassword] = useState(true);
@@ -95,9 +95,9 @@ const Login = ({ setIsRegister }) => {
         <Button
           variant="contained"
           color="primary"
-          onClick={() => setIsRegister(true)}
+          onClick={() => setIsSignUp(true)}
         >
-          Register
+          Sign Up
         </Button>
       </Form>
     </Container>
@@ -109,13 +109,13 @@ export default Login;
 const Container = styled.div`
   width: 300px;
   box-shadow: rgba(0, 0, 0, 0.08) 0px 4px 12px;
-  padding: 30px;
+  padding: 30px 35px;
   background-color: #fff;
 
   h1 {
     color: #ed6c02;
     font-size: 26px;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
     text-align: center;
   }
 `;
@@ -127,11 +127,11 @@ const Form = styled.form`
 
   .MuiTextField-root {
     width: 100%;
-    margin: 15px 0;
+    margin: 10px 0;
   }
 
   .MuiButton-root {
-    margin-top: 12px;
+    margin-top: 10px;
   }
 `;
 
@@ -139,5 +139,5 @@ const BreakLine = styled.span`
   width: 100%;
   height: 1px;
   background-color: #bdbdbd;
-  margin: 24px 0 8px;
+  margin: 20px 0 8px;
 `;

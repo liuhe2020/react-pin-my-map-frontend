@@ -110,24 +110,26 @@ const Pin = ({ pin, viewport, setViewport, currentPinId, setCurrentPinId }) => {
                   <p>{description}</p>
                 </>
               )}
-              <ButtonWrapper>
-                <Button
-                  variant="contained"
-                  size="small"
-                  color="primary"
-                  onClick={() => setIsEditing(true)}
-                >
-                  Edit
-                </Button>
-                <Button
-                  variant="contained"
-                  size="small"
-                  color="error"
-                  onClick={() => setToggleDelete(true)}
-                >
-                  Delete
-                </Button>
-              </ButtonWrapper>
+              {authUser && (
+                <ButtonWrapper>
+                  <Button
+                    variant="contained"
+                    size="small"
+                    color="primary"
+                    onClick={() => setIsEditing(true)}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    variant="contained"
+                    size="small"
+                    color="error"
+                    onClick={() => setToggleDelete(true)}
+                  >
+                    Delete
+                  </Button>
+                </ButtonWrapper>
+              )}
               {toggleDelete && (
                 <DeleteModal>
                   <p>Are you sure you want to delete {location}?</p>
@@ -188,7 +190,7 @@ const Wrapper = styled.div`
   h3,
   h4,
   p {
-    margin: 3px 0 15px 26px;
+    margin: 3px 0 0 26px;
     padding-left: 3px;
     color: #212121;
   }
@@ -228,10 +230,12 @@ const Line = styled.div`
   display: flex;
   align-items: center;
   color: #ed6c02;
+  margin-top: 15px;
 `;
 
 const ButtonWrapper = styled.div`
   text-align: center;
+  margin-top: 15px;
 
   button {
     margin: 5px;

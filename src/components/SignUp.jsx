@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 
 import GlobalContext from "../context/GlobalContext";
 
-const Register = ({ setIsRegister }) => {
+const SignUp = ({ setIsSignUp }) => {
   const { setAuthUser, setIsLoading } = useContext(GlobalContext);
   const [isValidUsername, setIsValidUsername] = useState(true);
   const [isValidEmail, setIsValidEmail] = useState(true);
@@ -68,7 +68,7 @@ const Register = ({ setIsRegister }) => {
     );
     if (res.status !== 200) {
       toast(
-        "Failed to register, please use a different username/email or try again later."
+        "Failed to sign up, please use a different username/email or try again later."
       );
     } else {
       const data = await res.json();
@@ -82,7 +82,7 @@ const Register = ({ setIsRegister }) => {
 
   return (
     <Container>
-      <h1>Register New Account</h1>
+      <h1>Create New Account</h1>
       <Form>
         <TextField
           id="outlined-basic-1"
@@ -136,13 +136,13 @@ const Register = ({ setIsRegister }) => {
           style={{ width: "100%" }}
           onClick={handleSubmit}
         >
-          Register
+          Sign Up
         </Button>
         <BreakLine />
         <Button
           variant="contained"
           color="primary"
-          onClick={() => setIsRegister(false)}
+          onClick={() => setIsSignUp(false)}
         >
           Back to login
         </Button>
@@ -151,18 +151,18 @@ const Register = ({ setIsRegister }) => {
   );
 };
 
-export default Register;
+export default SignUp;
 
 const Container = styled.div`
   width: 300px;
   box-shadow: rgba(0, 0, 0, 0.08) 0px 4px 12px;
-  padding: 30px;
+  padding: 30px 35px;
   background-color: #fff;
 
   h1 {
     color: #ed6c02;
     font-size: 26px;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
     text-align: center;
   }
 `;
@@ -174,11 +174,11 @@ const Form = styled.form`
 
   .MuiTextField-root {
     width: 100%;
-    margin: 15px 0;
+    margin: 10px 0;
   }
 
   .MuiButton-root {
-    margin-top: 12px;
+    margin-top: 10px;
   }
 `;
 
@@ -186,5 +186,5 @@ const BreakLine = styled.span`
   width: 100%;
   height: 1px;
   background-color: #bdbdbd;
-  margin: 24px 0 8px;
+  margin: 20px 0 8px;
 `;

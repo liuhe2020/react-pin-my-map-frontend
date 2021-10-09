@@ -69,7 +69,7 @@ const PhotoSlider = ({ photos }) => {
 export default PhotoSlider;
 
 const Container = styled.div`
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 
   .slick-dots li.slick-active button:before {
     color: #ed6c02;
