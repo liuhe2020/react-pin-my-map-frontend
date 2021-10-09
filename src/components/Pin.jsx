@@ -46,13 +46,13 @@ const Pin = ({ pin, viewport, setViewport, currentPinId, setCurrentPinId }) => {
     });
 
     if (res.status !== 200) {
-      toast("Network error. Please try again later.");
+      toast.error("Network error. Please try again later.");
     } else {
       getPins();
       setCurrentPinId(null);
       setIsEditing(false);
       setToggleDelete(false);
-      toast(`${location} - Deleted`);
+      toast.success(`${location} - Deleted`);
     }
 
     setIsLoading(false);

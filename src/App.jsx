@@ -1,6 +1,9 @@
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
-import { ToastContainer } from "react-toastify";
+import { ToastContainer, Slide } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import styled from "styled-components";
+import { ThemeProvider } from "@mui/material";
+import MuiTheme from "./MuiTheme";
 
 import GlobalStyles from "./globalStyles";
 import { GlobalProvider } from "./context/GlobalContext";
@@ -12,32 +15,39 @@ function App() {
   return (
     <GlobalProvider>
       <GlobalStyles />
-      <Router>
-        <Switch>
-          <Route path="/map">
-            <MapPage />
-          </Route>
-          <Route path="/maps/:id">
-            <UserMapPage />
-          </Route>
-          <Route path="/">
-            <HomePage />
-          </Route>
-        </Switch>
-      </Router>
-      <ToastContainer
+      <ThemeProvider theme={MuiTheme}>
+        <Router>
+          <Switch>
+            <Route path="/map">
+              <MapPage />
+            </Route>
+            <Route path="/maps/:id">
+              <UserMapPage />
+            </Route>
+            <Route path="/">
+              <HomePage />
+            </Route>
+          </Switch>
+        </Router>
+      </ThemeProvider>
+      <StyledToastContainer
         position="top-left"
-        autoClose={5000}
-        hideProgressBar={false}
+        autoClose={4000}
+        hideProgressBar
         newestOnTop={false}
         closeOnClick
         rtl={false}
         pauseOnFocusLoss
-        draggable
-        pauseOnHover
+        transition={Slide}
       />
     </GlobalProvider>
   );
 }
 
 export default App;
+
+const StyledToastContainer = styled(ToastContainer).attrs({
+  className: "toast-container",
+})`
+  width: 280px;
+`;

@@ -2,6 +2,7 @@ import styled from "styled-components";
 import { useState } from "react";
 import Menu from "@mui/material/Menu";
 import { TextField, Button } from "@mui/material";
+import { Share } from "@mui/icons-material";
 import {
   FacebookShareButton,
   TwitterShareButton,
@@ -41,6 +42,7 @@ const SocialShare = ({ id }) => {
         aria-expanded={open ? "true" : undefined}
         onClick={handleClick}
       >
+        <Share style={{ fontSize: "18px", marginRight: "3px" }} />
         Share
       </Button>
       <Menu
@@ -127,10 +129,6 @@ const Top = styled.div`
 
   .MuiOutlinedInput-root {
     width: 250px;
-
-    input {
-      height: 16px;
-    }
   }
 `;
 

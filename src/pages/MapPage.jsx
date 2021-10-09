@@ -4,6 +4,7 @@ import { Redirect } from "react-router-dom";
 import ReactMapGL, { Popup } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import Button from "@mui/material/Button";
+import { ExitToApp } from "@mui/icons-material";
 
 import GlobalContext from "../context/GlobalContext";
 import Pin from "../components/Pin";
@@ -76,6 +77,7 @@ const MapPage = () => {
           color="warning"
           onClick={handleLogout}
         >
+          <ExitToApp style={{ fontSize: "20px", marginRight: "3px" }} />
           Log out
         </Button>
         <SocialShare id={authUser.user.id} />

@@ -67,7 +67,7 @@ const SignUp = ({ setIsSignUp }) => {
       }
     );
     if (res.status !== 200) {
-      toast(
+      toast.error(
         "Failed to sign up, please use a different username/email or try again later."
       );
     } else {

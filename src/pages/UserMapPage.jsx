@@ -37,7 +37,7 @@ const UserMapPage = () => {
       if (res.status !== 200) {
         setIsLoading(false);
         history.push("/");
-        toast("Network error. Please try again later.");
+        toast.error("Network error. Please try again later.");
       } else {
         const user = await res.json();
         setPins(user.pins);

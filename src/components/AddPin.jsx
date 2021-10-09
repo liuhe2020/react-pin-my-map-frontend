@@ -41,7 +41,7 @@ const AddPin = ({ newCoord, setNewCoord }) => {
     const bigImages = imageFiles.filter((file) => file.size > 1024 * 1000);
 
     if (bigImages.length > 0) {
-      toast("The maximum size for each image is 1MB.");
+      toast.warn("The maximum size for each image is 1MB.");
     } else {
       setImages([...imageFiles]);
     }
@@ -82,11 +82,11 @@ const AddPin = ({ newCoord, setNewCoord }) => {
     });
 
     if (res.status !== 200) {
-      toast("Network error. Please try again later.");
+      toast.error("Network error. Please try again later.");
     } else {
       getPins();
       setNewCoord(null);
-      toast(`${submitValues.location} - Added`);
+      toast.success(`${submitValues.location} - Added`);
     }
 
     setIsLoading(false);

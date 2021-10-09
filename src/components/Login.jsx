@@ -45,7 +45,7 @@ const Login = ({ setIsSignUp }) => {
     });
 
     if (res.status !== 200) {
-      toast("Failed to log in, please try again.");
+      toast.error("Failed to log in, please try again.");
     } else {
       const data = await res.json();
       localStorage.setItem("pin-my-map-user", JSON.stringify(data));

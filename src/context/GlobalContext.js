@@ -18,7 +18,7 @@ export const GlobalProvider = ({ children }) => {
         `${process.env.REACT_APP_API_URL}/users/${authUser.user.id}`
       );
       if (res.status !== 200) {
-        toast("Network error. Please try again later.");
+        toast.error("Network error. Please try again later.");
         setIsLoading(false);
       } else {
         const user = await res.json();

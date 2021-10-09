@@ -35,7 +35,7 @@ const EditPin = ({ pin, setCurrentPinId, setIsEditing }) => {
     const bigImages = imageFiles.filter((file) => file.size > 1024 * 1000);
 
     if (bigImages.length > 0) {
-      toast("The maximum size for each image is 1MB.");
+      toast.warn("The maximum size for each image is 1MB.");
     } else {
       setAddedImages([...imageFiles]);
     }
@@ -132,12 +132,14 @@ const EditPin = ({ pin, setCurrentPinId, setIsEditing }) => {
     const hasFailedResponse = allResponses.some((res) => res.status !== 200);
 
     if (hasFailedResponse) {
-      toast("Network error. Failed to update the pin, please try again later.");
+      toast.error(
+        "Network error. Failed to update the pin, please try again later."
+      );
     } else {
       getPins();
       setCurrentPinId(null);
       setIsEditing(false);
-      toast(`${values.location} - Updated`);
+      toast.success(`${values.location} - Updated`);
     }
 
     setIsLoading(false);
