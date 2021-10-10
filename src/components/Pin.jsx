@@ -171,6 +171,8 @@ const Pin = ({ pin, viewport, setViewport, currentPinId, setCurrentPinId }) => {
 export default Pin;
 
 const Container = styled.div`
+  cursor: initial;
+
   .mapboxgl-popup {
     z-index: 2;
   }

@@ -184,7 +184,7 @@ const Form = styled.form`
 
 const BreakLine = styled.span`
   width: 100%;
-  height: 1px;
+  height: 0.5px;
   background-color: #bdbdbd;
   margin: 20px 0 8px;
 `;

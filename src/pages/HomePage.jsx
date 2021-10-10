@@ -15,20 +15,25 @@ const HomePage = () => {
 
   return (
     <Container>
-      <Logo src="./img/pin_logo_s.png" alt="pin_my_map_logo" />
-      <TitleWrapper>
-        <h1>Pin My Map</h1>
-        <h2>Record and share places that you have been.</h2>
-      </TitleWrapper>
-      <FormWrapper>
-        {isSignUp ? (
-          <SignUp setIsSignUp={setIsSignUp} />
-        ) : (
-          <Login setIsSignUp={setIsSignUp} />
-        )}
-      </FormWrapper>
+      <Main>
+        <Logo src="./img/pin_logo_s.png" alt="pin_my_map_logo" />
+        <TitleWrapper>
+          <h1>Pin My Map</h1>
+          <h2>Record and share places that you have been.</h2>
+        </TitleWrapper>
+        <FormWrapper>
+          {isSignUp ? (
+            <SignUp setIsSignUp={setIsSignUp} />
+          ) : (
+            <Login setIsSignUp={setIsSignUp} />
+          )}
+        </FormWrapper>
+        {isLoading && <Loader />}
+      </Main>
+      <Footer>
+        <p>&copy; 2021 Pin My Map</p>
+      </Footer>
       <Background src="./img/background.jpg" alt="pin_my_map_background" />
-      {isLoading && <Loader />}
     </Container>
   );
 };
@@ -37,9 +42,14 @@ export default HomePage;
 
 const Container = styled.div`
   position: relative;
-  width: 100vw;
+  display: flex;
+  flex-direction: column;
+`;
+
+const Main = styled.div`
   display: flex;
   justify-content: center;
+  min-height: 100vh;
 
   @media (max-width: 768px) {
     flex-direction: column;
@@ -100,4 +110,12 @@ const FormWrapper = styled.div`
   @media (max-width: 768px) {
     margin: 0 0 0 0;
   }
+`;
+
+const Footer = styled.div`
+  width: 100%;
+  text-align: center;
+  height: 60px;
+  margin-top: 40px;
+  color: #757575;
 `;
