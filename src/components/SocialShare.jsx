@@ -55,42 +55,55 @@ const SocialShare = ({ id }) => {
         }}
       >
         <Wrapper>
-          <Top>
-            <TextField
-              id="outlined-read-only-input"
-              label="Link Address"
-              defaultValue={url}
-              InputProps={{
-                readOnly: true,
-              }}
-            />
+          <TextField
+            id="outlined-read-only-input"
+            label="Link Address"
+            defaultValue={url}
+            InputProps={{
+              readOnly: true,
+            }}
+            style={{ width: "330px" }}
+          />
+          <Bottom>
             <Button
               variant="contained"
               size="small"
               color="primary"
               onClick={() => navigator.clipboard.writeText(url)}
+              style={{ transform: "translateY(-2.5px)" }}
             >
-              Copy
+              Copy link
             </Button>
-          </Top>
-          <Bottom>
-            <FacebookShareButton url={url}>
-              <FacebookIcon size={32} borderRadius={10} />
+            <FacebookShareButton
+              url={"https://pin-my-map-backend.herokuapp.com/"}
+            >
+              <FacebookIcon size={30} borderRadius={10} />
             </FacebookShareButton>
-            <TwitterShareButton url={url}>
-              <TwitterIcon size={32} borderRadius={10} />
+            <TwitterShareButton
+              url={"https://pin-my-map-backend.herokuapp.com/"}
+            >
+              <TwitterIcon size={30} borderRadius={10} />
             </TwitterShareButton>
-            <WhatsappShareButton url={url}>
-              <WhatsappIcon size={32} borderRadius={10} />
+            <WhatsappShareButton
+              url={"https://pin-my-map-backend.herokuapp.com/"}
+            >
+              <WhatsappIcon size={30} borderRadius={10} />
             </WhatsappShareButton>
-            <RedditShareButton url={url}>
-              <RedditIcon size={32} borderRadius={10} />
+            <RedditShareButton
+              url={"https://pin-my-map-backend.herokuapp.com/"}
+            >
+              <RedditIcon size={30} borderRadius={10} />
             </RedditShareButton>
-            <PinterestShareButton media="" url={url}>
-              <PinterestIcon size={32} borderRadius={10} />
+            <PinterestShareButton
+              media=""
+              url={"https://pin-my-map-backend.herokuapp.com/"}
+            >
+              <PinterestIcon size={30} borderRadius={10} />
             </PinterestShareButton>
-            <TumblrShareButton url={url}>
-              <TumblrIcon size={32} borderRadius={10} />
+            <TumblrShareButton
+              url={"https://pin-my-map-backend.herokuapp.com/"}
+            >
+              <TumblrIcon size={30} borderRadius={10} />
             </TumblrShareButton>
           </Bottom>
         </Wrapper>
@@ -102,25 +115,14 @@ const SocialShare = ({ id }) => {
 export default SocialShare;
 
 const Wrapper = styled.div`
-  width: 330px;
+  width: 370px;
   padding: 20px;
-`;
-
-const Top = styled.div`
-  display: flex;
-  align-items: center;
-
-  button {
-    margin-left: 15px;
-  }
-
-  .MuiOutlinedInput-root {
-    width: 250px;
-  }
 `;
 
 const Bottom = styled.div`
   margin-top: 15px;
+  display: flex;
+  align-items: center;
 
   button {
     margin: 0 5px;
