@@ -6,6 +6,7 @@ import ReactMapGL, { Popup } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import Button from "@mui/material/Button";
 import { toast } from "react-toastify";
+import { Helmet } from "react-helmet-async";
 
 import UserPin from "../components/UserPin";
 import Loader from "../components/Loader";
@@ -15,7 +16,7 @@ const UserMapPage = () => {
   const history = useHistory();
   const { id } = useParams();
   const { isLoading, setIsLoading } = useContext(GlobalContext);
-  const [pins, setPins] = useState(null);
+  const [user, setUser] = useState(null);
   const [currentPinId, setCurrentPinId] = useState(null);
   const [newCoord, setNewCoord] = useState(null);
   const [viewport, setViewport] = useState({
@@ -40,7 +41,7 @@ const UserMapPage = () => {
         toast.error("Network error. Please try again later.");
       } else {
         const user = await res.json();
-        setPins(user.pins);
+        setUser(user);
         setIsLoading(false);
       }
     };
@@ -49,14 +50,21 @@ const UserMapPage = () => {
 
   return (
     <Container>
+      <Helmet>
+        <title>{user && `Pin My Map | ${user.username}'s map`}</title>
+        <meta
+          name="description"
+          content="Pin My Map - view personalised map with pinned places the user has been to."
+        />
+      </Helmet>
       <ReactMapGL
         {...viewport}
         mapboxApiAccessToken={process.env.REACT_APP_MAPBOX}
         onViewportChange={(nextViewport) => setViewport(nextViewport)}
         mapStyle="mapbox://styles/liuhe2020/cktu2h4q70wil17m6umh33a9i"
       >
-        {pins &&
-          pins.map((pin) => (
+        {user &&
+          user.pins.map((pin) => (
             <UserPin
               key={pin.id}
               pin={pin}

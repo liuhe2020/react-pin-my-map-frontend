@@ -1,10 +1,12 @@
 import styled from "styled-components";
-import { useState, useContext } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Redirect } from "react-router-dom";
 import ReactMapGL, { Popup } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import Button from "@mui/material/Button";
 import { ExitToApp } from "@mui/icons-material";
+import { toast } from "react-toastify";
+import { Helmet } from "react-helmet-async";
 
 import GlobalContext from "../context/GlobalContext";
 import Pin from "../components/Pin";
@@ -24,6 +26,14 @@ const MapPage = () => {
     zoom: 4,
   });
 
+  useEffect(() => {
+    if (authUser)
+      toast.info("Tip: double click on the map to add a new pin.", {
+        position: "top-right",
+        autoClose: false,
+      });
+  }, [authUser]);
+
   if (!authUser) return <Redirect to="/" />;
 
   // create a new marker & popup at clicked location
@@ -39,6 +49,15 @@ const MapPage = () => {
 
   return (
     <Container>
+      <Helmet>
+        <title>
+          {authUser && `Pin My Map | ${authUser.user.username}'s map`}
+        </title>
+        <meta
+          name="description"
+          content="Pin My Map user's map page. Add, edit, update and delete pins on map."
+        />
+      </Helmet>
       <ReactMapGL
         {...viewport}
         mapboxApiAccessToken={process.env.REACT_APP_MAPBOX}
