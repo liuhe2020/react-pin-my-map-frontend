@@ -74,35 +74,22 @@ const SocialShare = ({ id }) => {
             >
               Copy link
             </Button>
-            <FacebookShareButton
-              url={"https://pin-my-map-backend.herokuapp.com/"}
-            >
+            <FacebookShareButton url={url}>
               <FacebookIcon size={30} borderRadius={10} />
             </FacebookShareButton>
-            <TwitterShareButton
-              url={"https://pin-my-map-backend.herokuapp.com/"}
-            >
+            <TwitterShareButton url={url}>
               <TwitterIcon size={30} borderRadius={10} />
             </TwitterShareButton>
-            <WhatsappShareButton
-              url={"https://pin-my-map-backend.herokuapp.com/"}
-            >
+            <WhatsappShareButton url={url}>
               <WhatsappIcon size={30} borderRadius={10} />
             </WhatsappShareButton>
-            <RedditShareButton
-              url={"https://pin-my-map-backend.herokuapp.com/"}
-            >
+            <RedditShareButton url={url}>
               <RedditIcon size={30} borderRadius={10} />
             </RedditShareButton>
-            <PinterestShareButton
-              media=""
-              url={"https://pin-my-map-backend.herokuapp.com/"}
-            >
+            <PinterestShareButton media="" url={url}>
               <PinterestIcon size={30} borderRadius={10} />
             </PinterestShareButton>
-            <TumblrShareButton
-              url={"https://pin-my-map-backend.herokuapp.com/"}
-            >
+            <TumblrShareButton url={url}>
               <TumblrIcon size={30} borderRadius={10} />
             </TumblrShareButton>
           </Bottom>
