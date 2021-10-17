@@ -3,8 +3,6 @@ import { Marker, Popup, FlyToInterpolator } from "react-map-gl";
 import { easeCubic } from "d3-ease";
 import { Room, Today, TextSnippet } from "@mui/icons-material";
 
-import PhotoSlider from "./PhotoSlider";
-
 const UserPin = ({
   pin,
   viewport,
@@ -55,7 +53,7 @@ const UserPin = ({
           offsetLeft={viewport.zoom * 3} //adjust offset to marker
         >
           <Wrapper>
-            {photos.length > 0 && <PhotoSlider photos={photos} />}
+            {/* {photos.length > 0 && <PhotoSlider photos={photos} />} */}
             <Line>
               <Room color="warning" />
               <label>Location</label>

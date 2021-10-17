@@ -50,6 +50,10 @@ const Login = ({ setIsSignUp }) => {
       const data = await res.json();
       localStorage.setItem("pin-my-map-user", JSON.stringify(data));
       setAuthUser(data);
+      toast.info("Tip: double click on the map to add a new pin.", {
+        position: "top-right",
+        autoClose: false,
+      });
     }
 
     setIsLoading(false);

@@ -1,48 +1,51 @@
-import { useState, useEffect, useContext } from "react";
-import styled from "styled-components";
-import AdapterDateFns from "@mui/lab/AdapterDateFns";
-import LocalizationProvider from "@mui/lab/LocalizationProvider";
-import DesktopDatePicker from "@mui/lab/DesktopDatePicker";
-import TextField from "@mui/material/TextField";
-import Button from "@mui/material/Button";
-import { Room, DeleteForever } from "@mui/icons-material";
-import { toast } from "react-toastify";
+import { useState, useEffect, useContext } from 'react';
+import styled from 'styled-components';
+import AdapterDateFns from '@mui/lab/AdapterDateFns';
+import LocalizationProvider from '@mui/lab/LocalizationProvider';
+import DesktopDatePicker from '@mui/lab/DesktopDatePicker';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import { Room, DeleteForever } from '@mui/icons-material';
+import { toast } from 'react-toastify';
 
-import GlobalContext from "../context/GlobalContext";
+import GlobalContext from '../context/GlobalContext';
 
-const EditPin = ({ pin, setCurrentPinId, setIsEditing }) => {
-  const [selectedDate, setSelectedDate] = useState(pin.date);
-  const [images, setImages] = useState(pin.photos);
+const EditPin = ({ setIsEditing }) => {
+  const { setIsLoading, authUser, currentPin, setCurrentPin } =
+    useContext(GlobalContext);
+
+  const [selectedDate, setSelectedDate] = useState(currentPin.date);
+  const [images, setImages] = useState(currentPin.photos);
   const [addedImageUrls, setAddedImageUrls] = useState(null);
   const [deletedImages, setDeletedImages] = useState([]);
   const [addedImages, setAddedImages] = useState([]);
   const [isEmpty, setIsEmpty] = useState(false);
   const [values, setValues] = useState({
-    location: pin.location,
-    description: pin.description,
-    latitude: pin.latitude,
-    longitude: pin.longitude,
+    location: currentPin.location,
+    description: currentPin.description,
+    latitude: currentPin.latitude,
+    longitude: currentPin.longitude,
   });
-
-  const { setIsLoading, authUser, getPins } = useContext(GlobalContext);
 
   const handleDateChange = (newDate) => setSelectedDate(newDate);
 
   const handleImageChange = (e) => {
     // convert Filelist object to array and update in images state
     const imageFiles = [...e.target.files];
-    // check images size
-    const bigImages = imageFiles.filter((file) => file.size > 1024 * 1000);
+    // check images size - limit 1MB
+    const oversizedImages = imageFiles.filter(
+      (file) => file.size > 1024 * 1000
+    );
 
-    if (bigImages.length > 0) {
-      toast.warn("The maximum size for each image is 1MB.");
+    if (oversizedImages.length > 0) {
+      toast.warn('The maximum size for each image is 1MB.');
     } else {
       setAddedImages([...imageFiles]);
     }
   };
 
   const handleImageDelete = (e) => {
-    const imageId = Number(e.target.closest("div").previousSibling.id);
+    const imageId = Number(e.target.closest('div').previousSibling.id);
     const newImages = images.filter((image) => image.id !== imageId);
     const newDeletedImage = images.filter((image) => image.id === imageId)[0];
     setImages(newImages);
@@ -64,14 +67,17 @@ const EditPin = ({ pin, setCurrentPinId, setIsEditing }) => {
 
   const amendValues = () => {
     const submitValues = { ...values, date: selectedDate };
-    const res = fetch(`${process.env.REACT_APP_API_URL}/pins/${pin.id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${authUser.jwt}`,
-      },
-      body: JSON.stringify(submitValues),
-    });
+    const res = fetch(
+      `${process.env.REACT_APP_API_URL}/pins/${currentPin.id}`,
+      {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${authUser.jwt}`,
+        },
+        body: JSON.stringify(submitValues),
+      }
+    );
     return res;
   };
 
@@ -81,7 +87,7 @@ const EditPin = ({ pin, setCurrentPinId, setIsEditing }) => {
         const singleRes = fetch(
           `${process.env.REACT_APP_API_URL}/upload/files/${image.id}`,
           {
-            method: "DELETE",
+            method: 'DELETE',
             headers: { Authorization: `Bearer ${authUser.jwt}` },
           }
         );
@@ -96,14 +102,14 @@ const EditPin = ({ pin, setCurrentPinId, setIsEditing }) => {
   const addImages = () => {
     if (addedImages.length > 0) {
       const formData = new FormData();
-      formData.append("ref", "pins");
-      formData.append("refId", pin.id);
-      formData.append("field", "photos");
+      formData.append('ref', 'pins');
+      formData.append('refId', currentPin.id);
+      formData.append('field', 'photos');
       addedImages.forEach((image) =>
         formData.append(`files`, image, image.name)
       );
       const res = fetch(`${process.env.REACT_APP_API_URL}/upload`, {
-        method: "POST",
+        method: 'POST',
         headers: { Authorization: `Bearer ${authUser.jwt}` },
         body: formData,
       });
@@ -117,7 +123,7 @@ const EditPin = ({ pin, setCurrentPinId, setIsEditing }) => {
     e.preventDefault();
 
     // validate location field
-    if (values.location === "") {
+    if (values.location === '') {
       setIsEmpty(true);
       return;
     }
@@ -129,15 +135,16 @@ const EditPin = ({ pin, setCurrentPinId, setIsEditing }) => {
       ...deleteImages(),
       ...addImages(),
     ]);
+
+    // check if any response has error
     const hasFailedResponse = allResponses.some((res) => res.status !== 200);
 
     if (hasFailedResponse) {
       toast.error(
-        "Network error. Failed to update the pin, please try again later."
+        'Network error. Failed to update the pin, please try again later.'
       );
     } else {
-      getPins();
-      setCurrentPinId(null);
+      getSinglePin();
       setIsEditing(false);
       toast.success(`${values.location} - Updated`);
     }
@@ -145,38 +152,49 @@ const EditPin = ({ pin, setCurrentPinId, setIsEditing }) => {
     setIsLoading(false);
   };
 
+  // get the pin after editting to update currentPin
+  const getSinglePin = async () => {
+    const res = await fetch(
+      `${process.env.REACT_APP_API_URL}/pins/${currentPin.id}`
+    );
+    const data = await res.json();
+    setCurrentPin(data);
+  };
+
+  console.log('Edit Pin');
+
   return (
     <Container>
       <Title>
-        <Room color="warning" fontSize="large" />
+        <Room color='warning' fontSize='large' />
         <h1>Edit Pin</h1>
       </Title>
       <Form onSubmit={handleSubmit}>
         <TextField
-          id="outlined-basic"
-          variant="outlined"
+          id='outlined-basic'
+          variant='outlined'
           error={isEmpty && true}
-          helperText={isEmpty && "This field cannot be empty."}
-          label="Location"
-          name="location"
+          helperText={isEmpty && 'This field cannot be empty.'}
+          label='Location'
+          name='location'
           value={values.location}
           onChange={handleValueChange}
         />
         <LocalizationProvider dateAdapter={AdapterDateFns}>
           <DesktopDatePicker
-            inputFormat="dd/MM/yyyy"
-            label="Date"
+            inputFormat='dd/MM/yyyy'
+            label='Date'
             value={selectedDate}
             onChange={handleDateChange}
             renderInput={(params) => <TextField {...params} />}
           />
         </LocalizationProvider>
         <TextField
-          id="outlined-multiline-static"
+          id='outlined-multiline-static'
           multiline
-          rows={4}
-          label="Description"
-          name="description"
+          rows={8}
+          label='Description'
+          name='description'
           value={values.description}
           onChange={handleValueChange}
         />
@@ -188,7 +206,7 @@ const EditPin = ({ pin, setCurrentPinId, setIsEditing }) => {
                   <Photo id={photo.id} src={photo.formats.thumbnail.url} />
                   <div>
                     <DeleteForever
-                      color="warning"
+                      color='warning'
                       onClick={handleImageDelete}
                     />
                   </div>
@@ -196,32 +214,49 @@ const EditPin = ({ pin, setCurrentPinId, setIsEditing }) => {
               ))}
               {addedImageUrls &&
                 addedImageUrls.map((url, index) => (
-                  <Photo key={index} src={url} />
+                  <PhotoWrapper key={index}>
+                    <Photo src={url} />
+                  </PhotoWrapper>
                 ))}
             </PhotosGrid>
           )}
           <p>The maximum image size is 5MB.</p>
-          <label htmlFor="contained-button-file">
+          <label htmlFor='contained-button-file'>
             <Input
-              accept="image/*"
-              id="contained-button-file"
+              accept='image/*'
+              id='contained-button-file'
               multiple
-              type="file"
+              type='file'
               onChange={handleImageChange}
             />
             <Button
-              variant="contained"
-              component="span"
-              size="small"
-              color="warning"
+              variant='contained'
+              component='span'
+              size='small'
+              color='warning'
             >
-              {!addedImageUrls ? "Add Photos" : "Change Photos"}
+              {!addedImageUrls ? 'Add Photos' : 'Change Photos'}
             </Button>
           </label>
         </PhotosContainer>
-        <Button variant="contained" color="primary" type="submit">
-          Confirm
-        </Button>
+        <ButtonWrapper>
+          <Button
+            variant='contained'
+            size='small'
+            color='primary'
+            type='submit'
+          >
+            Confirm
+          </Button>
+          <Button
+            variant='contained'
+            size='small'
+            color='error'
+            onClick={() => setIsEditing(false)}
+          >
+            Cancel
+          </Button>
+        </ButtonWrapper>
       </Form>
     </Container>
   );
@@ -231,7 +266,13 @@ export default EditPin;
 
 const Container = styled.div`
   cursor: initial;
-  width: 400px;
+  width: 100%;
+  padding: 20px;
+  direction: ltr;
+
+  @media (max-width: 768px) {
+    padding: 20px 0;
+  }
 `;
 
 const Title = styled.div`
@@ -285,14 +326,19 @@ const PhotosContainer = styled.div`
 const PhotosGrid = styled.div`
   padding: 6px 12px 12px 12px;
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(6, 1fr);
   grid-gap: 4px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
 `;
 
 const PhotoWrapper = styled.div`
   position: relative;
   width: 100%;
-  height: 47.69px;
+  height: 0;
+  padding-bottom: 100%;
 
   div {
     position: absolute;
@@ -321,11 +367,24 @@ const PhotoWrapper = styled.div`
 `;
 
 const Photo = styled.img`
+  position: absolute;
   width: 100%;
-  height: 47.69px;
+  height: 100%;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   object-fit: cover;
 `;
 
-const Input = styled("input")({
-  display: "none",
+const Input = styled('input')({
+  display: 'none',
 });
+
+const ButtonWrapper = styled.div`
+  margin-top: 20px;
+
+  .MuiButton-root {
+    margin: 5px;
+  }
+`;
