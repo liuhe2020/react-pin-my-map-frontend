@@ -1,9 +1,8 @@
 import { useState, useContext, useRef } from 'react';
 import styled from 'styled-components';
 import { Redirect } from 'react-router-dom';
-import ReactMapGL, { FlyToInterpolator } from 'react-map-gl';
+import ReactMapGL from 'react-map-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { easeCubic } from 'd3-ease';
 import Button from '@mui/material/Button';
 import { ExitToApp } from '@mui/icons-material';
 import { Helmet } from 'react-helmet-async';
