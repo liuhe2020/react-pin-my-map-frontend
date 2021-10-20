@@ -1,4 +1,4 @@
-import { createGlobalStyle } from "styled-components";
+import { createGlobalStyle } from 'styled-components';
 
 const GlobalStyles = createGlobalStyle`
 
@@ -6,7 +6,7 @@ const GlobalStyles = createGlobalStyle`
         font-family: 'Rubik', sans-serif;
         margin: 0;
         padding: 0;
-        box-sizing:border-box;
+        box-sizing: border-box;
     }
 `;
 

@@ -1,8 +1,8 @@
 import styled from 'styled-components';
 import { SRLWrapper } from 'simple-react-lightbox';
 
-const Gallery = ({ pin }) => {
-  const photoUrls = pin.photos.map((photo) => ({
+const Gallery = ({ currentPin }) => {
+  const photoUrls = currentPin.photos.map((photo) => ({
     thumbnail: photo.formats.thumbnail.url,
     original: photo.url,
   }));
@@ -19,7 +19,7 @@ const Gallery = ({ pin }) => {
         <Grid>
           {photoUrls.map((url, index) => (
             <a key={index} href={url.original}>
-              <img src={url.thumbnail} alt={pin.location} />
+              <img src={url.thumbnail} alt={currentPin.location} />
             </a>
           ))}
         </Grid>

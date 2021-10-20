@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useRef } from 'react';
 import styled from 'styled-components';
 import { Redirect } from 'react-router-dom';
 import ReactMapGL, { FlyToInterpolator } from 'react-map-gl';
@@ -10,17 +10,18 @@ import { Helmet } from 'react-helmet-async';
 import { AnimatePresence } from 'framer-motion';
 
 import GlobalContext from '../context/GlobalContext';
+import Drawer from '../components/Drawer';
 import Pin from '../components/Pin';
-import PinDetails from '../components/PinDetails';
-import AddPin from '../components/AddPin';
 import Loader from '../components/Loader';
 import SocialShare from '../components/SocialShare';
 
 const MapPage = () => {
-  const { pins, authUser, setAuthUser, isLoading, currentPin } =
+  const { pins, authUser, setAuthUser, isLoading, setNewPin, setCurrentPin } =
     useContext(GlobalContext);
-  const [togglePinDetails, setTogglePinDetails] = useState(false);
-  const [newCoord, setNewCoord] = useState(null);
+
+  const [toggleDrawer, setToggleDrawer] = useState(false);
+  const [toggleAddPin, setToggleAddPin] = useState(false);
+  const [toggleEditPin, setToggleEditPin] = useState(false);
   const [viewport, setViewport] = useState({
     width: '100vw',
     height: '100vh',
@@ -31,33 +32,30 @@ const MapPage = () => {
     maxZoom: 19,
   });
 
-  if (!authUser) return <Redirect to='/' />;
+  const ref = useRef();
 
-  const handlePinDetailsClose = () => {
-    setTogglePinDetails(false);
-    setNewCoord(null);
-    // set pin to centre of viewport
-    setViewport({
-      ...viewport,
-      latitude: currentPin.latitude,
-      longitude: currentPin.longitude,
-      transitionInterpolator: new FlyToInterpolator(),
-      transitionDuration: 800,
-      transitionEasing: easeCubic,
-    });
+  const handleMapClick = () => {
+    if (toggleDrawer) {
+      ref.current.handleDrawerClose();
+    }
   };
 
-  // create a new marker & popup at clicked location
+  // create a new marker at clicked location
   const handleMapDblClick = (e) => {
     const [long, lat] = e.lngLat;
-    console.log(e.lngLat);
-    setNewCoord({ lat, long });
+    setNewPin({ lat, long });
+    setCurrentPin(null);
+    setToggleEditPin(false);
+    setToggleDrawer(true);
+    setToggleAddPin(true);
   };
 
   const handleLogout = () => {
     localStorage.removeItem('pin-my-map-user');
     setAuthUser(null);
   };
+
+  if (!authUser) return <Redirect to='/' />;
 
   return (
     <Container>
@@ -72,10 +70,11 @@ const MapPage = () => {
       </Helmet>
       <ReactMapGL
         {...viewport}
+        mapStyle='mapbox://styles/liuhe2020/cktu2h4q70wil17m6umh33a9i'
+        doubleClickZoom={false}
         mapboxApiAccessToken={process.env.REACT_APP_MAPBOX}
         onViewportChange={setViewport}
-        mapStyle='mapbox://styles/liuhe2020/cktu2h4q70wil17m6umh33a9i'
-        onClick={handlePinDetailsClose}
+        onClick={handleMapClick}
         onDblClick={handleMapDblClick}
       >
         {pins &&
@@ -84,19 +83,25 @@ const MapPage = () => {
               key={pin.id}
               pin={pin}
               setViewport={setViewport}
-              setTogglePinDetails={setTogglePinDetails}
+              setToggleDrawer={setToggleDrawer}
+              setToggleAddPin={setToggleAddPin}
+              setToggleEditPin={setToggleEditPin}
             />
           ))}
         {isLoading && <Loader />}
       </ReactMapGL>
       <AnimatePresence>
-        {togglePinDetails && (
-          <PinDetails
-            setTogglePinDetails={setTogglePinDetails}
+        {toggleDrawer && (
+          <Drawer
+            toggleAddPin={toggleAddPin}
+            setToggleAddPin={setToggleAddPin}
+            setToggleDrawer={setToggleDrawer}
+            toggleEditPin={toggleEditPin}
+            setToggleEditPin={setToggleEditPin}
             setViewport={setViewport}
+            ref={ref}
           />
         )}
-        {newCoord && <AddPin newCoord={newCoord} setNewCoord={setNewCoord} />}
       </AnimatePresence>
       <ButtonWrapper>
         <SocialShare id={authUser.user.id} />

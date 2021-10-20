@@ -1,10 +1,11 @@
-import { useState, useContext } from "react";
-import styled from "styled-components";
-import TextField from "@mui/material/TextField";
-import Button from "@mui/material/Button";
-import { toast } from "react-toastify";
+import { useState, useContext } from 'react';
+import styled from 'styled-components';
+import { styled as muiStyled } from '@mui/material/styles';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import { toast } from 'react-toastify';
 
-import GlobalContext from "../context/GlobalContext";
+import GlobalContext from '../context/GlobalContext';
 
 const SignUp = ({ setIsSignUp }) => {
   const { setAuthUser, setIsLoading } = useContext(GlobalContext);
@@ -13,10 +14,10 @@ const SignUp = ({ setIsSignUp }) => {
   const [isValidPassword, setIsValidPassword] = useState(true);
   const [isValidConfirmPassword, setIsValidConfirmPassword] = useState(true);
   const [newUser, setNewUser] = useState({
-    username: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
+    username: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
   });
 
   const handleChange = (e) => {
@@ -61,18 +62,18 @@ const SignUp = ({ setIsSignUp }) => {
     const res = await fetch(
       `${process.env.REACT_APP_API_URL}/auth/local/register`,
       {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(submitValues),
       }
     );
     if (res.status !== 200) {
       toast.error(
-        "Failed to sign up, please use a different username/email or try again later."
+        'Failed to sign up, please use a different username/email or try again later.'
       );
     } else {
       const data = await res.json();
-      localStorage.setItem("pin-my-map-user", JSON.stringify(data));
+      localStorage.setItem('pin-my-map-user', JSON.stringify(data));
       setAuthUser(data);
       toast(`Welcome to Pin My Map, ${submitValues.username}.`);
     }
@@ -84,68 +85,68 @@ const SignUp = ({ setIsSignUp }) => {
     <Container>
       <h1>Create New Account</h1>
       <Form>
-        <TextField
-          id="outlined-basic-1"
-          variant="outlined"
-          color="warning"
-          label="Username"
-          name="username"
+        <StyledTextField
+          id='outlined-basic-1'
+          variant='outlined'
+          color='warning'
+          label='Username'
+          name='username'
           value={newUser.username}
           onChange={handleChange}
           error={!isValidUsername && true}
-          helperText={!isValidUsername && "Minimum 3 characters"}
+          helperText={!isValidUsername && 'Minimum 3 characters'}
         />
-        <TextField
-          id="outlined-basic-2"
-          variant="outlined"
-          color="warning"
-          label="Email"
-          name="email"
+        <StyledTextField
+          id='outlined-basic-2'
+          variant='outlined'
+          color='warning'
+          label='Email'
+          name='email'
           value={newUser.email}
           onChange={handleChange}
           error={!isValidEmail && true}
-          helperText={!isValidEmail && "Invalid email address"}
+          helperText={!isValidEmail && 'Invalid email address'}
         />
-        <TextField
-          id="outlined-basic-3"
-          variant="outlined"
-          color="warning"
-          type="password"
-          label="Password"
-          name="password"
+        <StyledTextField
+          id='outlined-basic-3'
+          variant='outlined'
+          color='warning'
+          type='password'
+          label='Password'
+          name='password'
           value={newUser.password}
           onChange={handleChange}
           error={!isValidPassword && true}
-          helperText={!isValidPassword && "Minimum 6 characters"}
+          helperText={!isValidPassword && 'Minimum 6 characters'}
         />
-        <TextField
-          id="outlined-basic-4"
-          variant="outlined"
-          color="warning"
-          type="password"
-          label="Confirm password"
-          name="confirmPassword"
+        <StyledTextField
+          id='outlined-basic-4'
+          variant='outlined'
+          color='warning'
+          type='password'
+          label='Confirm password'
+          name='confirmPassword'
           value={newUser.confirmPassword}
           onChange={handleChange}
           error={!isValidConfirmPassword && true}
-          helperText={!isValidConfirmPassword && "Passwords do not match"}
+          helperText={!isValidConfirmPassword && 'Passwords do not match'}
         />
-        <Button
-          variant="contained"
-          color="warning"
-          style={{ width: "100%" }}
+        <StyledButton
+          variant='contained'
+          color='warning'
+          style={{ width: '100%' }}
           onClick={handleSubmit}
         >
           Sign Up
-        </Button>
+        </StyledButton>
         <BreakLine />
-        <Button
-          variant="contained"
-          color="primary"
+        <StyledButton
+          variant='contained'
+          color='primary'
           onClick={() => setIsSignUp(false)}
         >
           Back to login
-        </Button>
+        </StyledButton>
       </Form>
     </Container>
   );
@@ -171,15 +172,15 @@ const Form = styled.form`
   display: flex;
   flex-direction: column;
   align-items: center;
+`;
 
-  .MuiTextField-root {
-    width: 100%;
-    margin: 10px 0;
-  }
+const StyledTextField = muiStyled(TextField)`
+  width: 100%;
+  margin: 10px 0;
+`;
 
-  .MuiButton-root {
-    margin-top: 10px;
-  }
+const StyledButton = muiStyled(Button)`
+  margin-top: 10px;
 `;
 
 const BreakLine = styled.span`

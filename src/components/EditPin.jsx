@@ -1,5 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
 import styled from 'styled-components';
+import { styled as muiStyled } from '@mui/material/styles';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import DesktopDatePicker from '@mui/lab/DesktopDatePicker';
@@ -10,8 +11,8 @@ import { toast } from 'react-toastify';
 
 import GlobalContext from '../context/GlobalContext';
 
-const EditPin = ({ setIsEditing }) => {
-  const { setIsLoading, authUser, currentPin, setCurrentPin } =
+const EditPin = ({ setToggleEditPin }) => {
+  const { setIsLoading, authUser, currentPin, setCurrentPin, pins, setPins } =
     useContext(GlobalContext);
 
   const [selectedDate, setSelectedDate] = useState(currentPin.date);
@@ -144,33 +145,39 @@ const EditPin = ({ setIsEditing }) => {
         'Network error. Failed to update the pin, please try again later.'
       );
     } else {
-      getSinglePin();
-      setIsEditing(false);
-      toast.success(`${values.location} - Updated`);
+      // get the pin after editting to update currentPin & pins(for map markers)
+      const editedRes = await fetch(
+        `${process.env.REACT_APP_API_URL}/pins/${currentPin.id}`
+      );
+      if (editedRes.status !== 200) {
+        toast.error(
+          'Network error. Failed to retrieve the dated pin, please refresh the page.'
+        );
+      } else {
+        const data = await editedRes.json();
+        const EditedPins = pins.map((pin) =>
+          pin.id === data.id ? { ...data } : pin
+        );
+        setCurrentPin(data);
+        setPins(EditedPins);
+        setToggleEditPin(false);
+        toast.success(`${values.location} - Updated`);
+      }
     }
 
     setIsLoading(false);
   };
 
-  // get the pin after editting to update currentPin
-  const getSinglePin = async () => {
-    const res = await fetch(
-      `${process.env.REACT_APP_API_URL}/pins/${currentPin.id}`
-    );
-    const data = await res.json();
-    setCurrentPin(data);
-  };
-
   console.log('Edit Pin');
 
   return (
-    <Container>
+    <>
       <Title>
         <Room color='warning' fontSize='large' />
         <h1>Edit Pin</h1>
       </Title>
       <Form onSubmit={handleSubmit}>
-        <TextField
+        <StyledTextField
           id='outlined-basic'
           variant='outlined'
           error={isEmpty && true}
@@ -186,10 +193,10 @@ const EditPin = ({ setIsEditing }) => {
             label='Date'
             value={selectedDate}
             onChange={handleDateChange}
-            renderInput={(params) => <TextField {...params} />}
+            renderInput={(params) => <StyledTextField {...params} />}
           />
         </LocalizationProvider>
-        <TextField
+        <StyledTextField
           id='outlined-multiline-static'
           multiline
           rows={8}
@@ -229,51 +236,40 @@ const EditPin = ({ setIsEditing }) => {
               type='file'
               onChange={handleImageChange}
             />
-            <Button
+            <StyledAddButton
               variant='contained'
               component='span'
               size='small'
               color='warning'
             >
               {!addedImageUrls ? 'Add Photos' : 'Change Photos'}
-            </Button>
+            </StyledAddButton>
           </label>
         </PhotosContainer>
         <ButtonWrapper>
-          <Button
+          <StyledButton
             variant='contained'
             size='small'
             color='primary'
             type='submit'
           >
             Confirm
-          </Button>
-          <Button
+          </StyledButton>
+          <StyledButton
             variant='contained'
             size='small'
             color='error'
-            onClick={() => setIsEditing(false)}
+            onClick={() => setToggleEditPin(false)}
           >
             Cancel
-          </Button>
+          </StyledButton>
         </ButtonWrapper>
       </Form>
-    </Container>
+    </>
   );
 };
 
 export default EditPin;
-
-const Container = styled.div`
-  cursor: initial;
-  width: 100%;
-  padding: 20px;
-  direction: ltr;
-
-  @media (max-width: 768px) {
-    padding: 20px 0;
-  }
-`;
 
 const Title = styled.div`
   display: flex;
@@ -288,21 +284,21 @@ const Form = styled.form`
   flex-direction: column;
   align-items: center;
   width: 100%;
+`;
 
-  .MuiTextField-root {
-    width: 95%;
-    margin: 12px;
-  }
+const StyledTextField = muiStyled(TextField)`
+  width: 100%;
+  margin: 12px;
+`;
 
-  .MuiButton-root {
-    margin: 12px;
-  }
+const StyledAddButton = muiStyled(Button)`
+  margin: 12px;
 `;
 
 const PhotosContainer = styled.div`
   border: 1px solid #bdbdbd;
   border-radius: 4px;
-  width: 95%;
+  width: 100%;
   margin: 12px 0;
   padding: 12px 0;
   display: flex;
@@ -383,8 +379,8 @@ const Input = styled('input')({
 
 const ButtonWrapper = styled.div`
   margin-top: 20px;
+`;
 
-  .MuiButton-root {
-    margin: 5px;
-  }
+const StyledButton = muiStyled(Button)`
+  margin: 5px;
 `;

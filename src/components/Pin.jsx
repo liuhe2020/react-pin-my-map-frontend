@@ -1,20 +1,27 @@
 import React from 'react';
-import styled from 'styled-components';
 import { useContext } from 'react';
 import { Marker, FlyToInterpolator } from 'react-map-gl';
 import { easeCubic } from 'd3-ease';
 import { Room } from '@mui/icons-material';
+import { styled as muiStyled } from '@mui/material/styles';
 
 import GlobalContext from '../context/GlobalContext';
 
-const Pin = ({ pin, setViewport, setTogglePinDetails }) => {
+const Pin = ({
+  pin,
+  setViewport,
+  setToggleDrawer,
+  setToggleAddPin,
+  setToggleEditPin,
+}) => {
   const { setCurrentPin } = useContext(GlobalContext);
 
-  // show popup when marker is clicked and "attach" the popup to related marker
   // transition properties are for animation when jumping from one pin to another
   const handleMarkerClick = () => {
     setCurrentPin(pin);
-    setTogglePinDetails(true);
+    setToggleEditPin(false);
+    setToggleAddPin(false);
+    setToggleDrawer(true);
     setViewport((prevState) => ({
       ...prevState,
       zoom: 12,
@@ -35,13 +42,14 @@ const Pin = ({ pin, setViewport, setTogglePinDetails }) => {
       offsetLeft={-15} //centering marker
       offsetTop={-30} //centering marker
     >
-      <Room
-        style={{ fontSize: 30, cursor: 'pointer' }}
-        color='warning'
-        onClick={handleMarkerClick}
-      />
+      <StyledRoomIcon color='warning' onClick={handleMarkerClick} />
     </Marker>
   );
 };
 
 export default React.memo(Pin);
+
+const StyledRoomIcon = muiStyled(Room)`
+  font-size: 30px;
+  cursor: pointer;
+`;

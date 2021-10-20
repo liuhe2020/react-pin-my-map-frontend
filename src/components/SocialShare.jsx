@@ -1,8 +1,8 @@
-import styled from "styled-components";
-import { useState } from "react";
-import Menu from "@mui/material/Menu";
-import { TextField, Button } from "@mui/material";
-import { Share } from "@mui/icons-material";
+import { useState } from 'react';
+import styled from 'styled-components';
+import Menu from '@mui/material/Menu';
+import { TextField, Button } from '@mui/material';
+import { Share } from '@mui/icons-material';
 import {
   FacebookShareButton,
   TwitterShareButton,
@@ -16,7 +16,7 @@ import {
   TumblrIcon,
   TwitterIcon,
   WhatsappIcon,
-} from "react-share";
+} from 'react-share';
 
 const SocialShare = ({ id }) => {
   const url = `${process.env.REACT_APP_URL}/maps/${id}`;
@@ -33,44 +33,44 @@ const SocialShare = ({ id }) => {
   return (
     <>
       <Button
-        id="basic-button"
-        variant="contained"
-        size="small"
-        color="warning"
-        aria-controls="basic-menu"
-        aria-haspopup="true"
-        aria-expanded={open ? "true" : undefined}
+        id='basic-button'
+        variant='contained'
+        size='small'
+        color='warning'
+        aria-controls='basic-menu'
+        aria-haspopup='true'
+        aria-expanded={open ? 'true' : undefined}
         onClick={handleClick}
       >
-        <Share style={{ fontSize: "18px", marginRight: "3px" }} />
+        <Share style={{ fontSize: '18px', marginRight: '3px' }} />
         Share
       </Button>
       <Menu
-        id="basic-menu"
+        id='basic-menu'
         anchorEl={anchorEl}
         open={open}
         onClose={handleClose}
         MenuListProps={{
-          "aria-labelledby": "basic-button",
+          'aria-labelledby': 'basic-button',
         }}
       >
         <Wrapper>
           <TextField
-            id="outlined-read-only-input"
-            label="Link Address"
+            id='outlined-read-only-input'
+            label='Link Address'
             defaultValue={url}
             InputProps={{
               readOnly: true,
             }}
-            style={{ width: "330px" }}
+            style={{ width: '330px' }}
           />
           <Bottom>
             <Button
-              variant="contained"
-              size="small"
-              color="primary"
+              variant='contained'
+              size='small'
+              color='primary'
               onClick={() => navigator.clipboard.writeText(url)}
-              style={{ transform: "translateY(-2.5px)" }}
+              style={{ transform: 'translateY(-2.5px)' }}
             >
               Copy link
             </Button>
@@ -86,7 +86,7 @@ const SocialShare = ({ id }) => {
             <RedditShareButton url={url}>
               <RedditIcon size={30} borderRadius={10} />
             </RedditShareButton>
-            <PinterestShareButton media="" url={url}>
+            <PinterestShareButton media='' url={url}>
               <PinterestIcon size={30} borderRadius={10} />
             </PinterestShareButton>
             <TumblrShareButton url={url}>

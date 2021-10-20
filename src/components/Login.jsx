@@ -1,18 +1,19 @@
-import { useState, useContext } from "react";
-import styled from "styled-components";
-import TextField from "@mui/material/TextField";
-import Button from "@mui/material/Button";
-import { toast } from "react-toastify";
+import { useState, useContext } from 'react';
+import styled from 'styled-components';
+import { styled as muiStyled } from '@mui/material/styles';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import { toast } from 'react-toastify';
 
-import GlobalContext from "../context/GlobalContext";
+import GlobalContext from '../context/GlobalContext';
 
 const Login = ({ setIsSignUp }) => {
   const { setAuthUser, setIsLoading } = useContext(GlobalContext);
   const [hasEmail, setHasEmail] = useState(true);
   const [hasPassword, setHasPassword] = useState(true);
   const [loginCreds, setLoginCreds] = useState({
-    identifier: "",
-    password: "",
+    identifier: '',
+    password: '',
   });
 
   const handleChange = (e) => {
@@ -26,12 +27,12 @@ const Login = ({ setIsSignUp }) => {
     e.preventDefault();
 
     // validate form - no empty fields
-    if (loginCreds.identifier === "") {
+    if (loginCreds.identifier === '') {
       setHasEmail(false);
       return;
     }
 
-    if (loginCreds.password === "") {
+    if (loginCreds.password === '') {
       setHasPassword(false);
       return;
     }
@@ -39,19 +40,19 @@ const Login = ({ setIsSignUp }) => {
     setIsLoading(true);
 
     const res = await fetch(`${process.env.REACT_APP_API_URL}/auth/local`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(loginCreds),
     });
 
     if (res.status !== 200) {
-      toast.error("Failed to log in, please try again.");
+      toast.error('Failed to log in, please try again.');
     } else {
       const data = await res.json();
-      localStorage.setItem("pin-my-map-user", JSON.stringify(data));
+      localStorage.setItem('pin-my-map-user', JSON.stringify(data));
       setAuthUser(data);
-      toast.info("Tip: double click on the map to add a new pin.", {
-        position: "top-right",
+      toast.info('Tip: double click on the map to add a new pin.', {
+        position: 'top-left',
         autoClose: false,
       });
     }
@@ -63,46 +64,46 @@ const Login = ({ setIsSignUp }) => {
     <Container>
       <h1>Account Login</h1>
       <Form>
-        <TextField
-          id="outlined-password-input"
-          label="Username or email address"
-          name="identifier"
+        <StyledTextField
+          id='outlined-password-input'
+          label='Username or email address'
+          name='identifier'
           value={loginCreds.identifier}
-          variant="outlined"
-          color="warning"
+          variant='outlined'
+          color='warning'
           onChange={handleChange}
           error={!hasEmail && true}
-          helperText={!hasEmail && "Email address is required."}
+          helperText={!hasEmail && 'Email address is required.'}
         />
-        <TextField
-          id="outlined-basic"
-          type="password"
-          autoComplete="current-password"
-          label="Password"
-          name="password"
+        <StyledTextField
+          id='outlined-basic'
+          type='password'
+          autoComplete='current-password'
+          label='Password'
+          name='password'
           value={loginCreds.password}
-          variant="outlined"
-          color="warning"
+          variant='outlined'
+          color='warning'
           onChange={handleChange}
           error={!hasPassword && true}
-          helperText={!hasPassword && "Password is required."}
+          helperText={!hasPassword && 'Password is required.'}
         />
-        <Button
-          variant="contained"
-          color="warning"
-          style={{ width: "100%" }}
+        <StyledButton
+          variant='contained'
+          color='warning'
+          style={{ width: '100%' }}
           onClick={handleSubmit}
         >
           Log in
-        </Button>
+        </StyledButton>
         <BreakLine />
-        <Button
-          variant="contained"
-          color="primary"
+        <StyledButton
+          variant='contained'
+          color='primary'
           onClick={() => setIsSignUp(true)}
         >
           Sign Up
-        </Button>
+        </StyledButton>
       </Form>
     </Container>
   );
@@ -128,15 +129,15 @@ const Form = styled.form`
   display: flex;
   flex-direction: column;
   align-items: center;
+`;
 
-  .MuiTextField-root {
-    width: 100%;
-    margin: 10px 0;
-  }
+const StyledTextField = muiStyled(TextField)`
+  width: 100%;
+  margin: 10px 0;
+`;
 
-  .MuiButton-root {
-    margin-top: 10px;
-  }
+const StyledButton = muiStyled(Button)`
+  margin-top: 10px;
 `;
 
 const BreakLine = styled.span`

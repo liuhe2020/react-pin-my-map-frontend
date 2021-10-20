@@ -7,6 +7,7 @@ export const GlobalProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [pins, setPins] = useState(null);
   const [currentPin, setCurrentPin] = useState(null);
+  const [newPin, setNewPin] = useState(null);
   const [authUser, setAuthUser] = useState(
     JSON.parse(localStorage.getItem('pin-my-map-user'))
   );
@@ -44,6 +45,8 @@ export const GlobalProvider = ({ children }) => {
         setAuthUser,
         currentPin,
         setCurrentPin,
+        newPin,
+        setNewPin,
         getPins,
       }}
     >
