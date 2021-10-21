@@ -97,8 +97,6 @@ const AddPin = ({ handleDrawerClose, setToggleAddPin }) => {
     setIsLoading(false);
   };
 
-  console.log('Add Pin');
-
   return (
     <>
       <Title>

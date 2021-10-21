@@ -1,8 +1,10 @@
-import { useState, useContext, useRef } from 'react';
+import 'mapbox-gl/dist/mapbox-gl.css';
+import 'react-map-gl-geocoder/dist/mapbox-gl-geocoder.css';
+import { useState, useContext, useRef, useCallback } from 'react';
 import styled from 'styled-components';
 import { Redirect } from 'react-router-dom';
-import ReactMapGL from 'react-map-gl';
-import 'mapbox-gl/dist/mapbox-gl.css';
+import ReactMapGL, { Marker } from 'react-map-gl';
+import Geocoder from 'react-map-gl-geocoder';
 import Button from '@mui/material/Button';
 import { ExitToApp } from '@mui/icons-material';
 import { Helmet } from 'react-helmet-async';
@@ -15,8 +17,15 @@ import Loader from '../components/Loader';
 import SocialShare from '../components/SocialShare';
 
 const MapPage = () => {
-  const { pins, authUser, setAuthUser, isLoading, setNewPin, setCurrentPin } =
-    useContext(GlobalContext);
+  const {
+    pins,
+    authUser,
+    setAuthUser,
+    isLoading,
+    newPin,
+    setNewPin,
+    setCurrentPin,
+  } = useContext(GlobalContext);
 
   const [toggleDrawer, setToggleDrawer] = useState(false);
   const [toggleAddPin, setToggleAddPin] = useState(false);
@@ -31,11 +40,12 @@ const MapPage = () => {
     maxZoom: 19,
   });
 
-  const ref = useRef();
+  const mapRef = useRef();
+  const drawerRef = useRef();
 
   const handleMapClick = () => {
     if (toggleDrawer) {
-      ref.current.handleDrawerClose();
+      drawerRef.current.handleDrawerClose();
     }
   };
 
@@ -48,6 +58,24 @@ const MapPage = () => {
     setToggleDrawer(true);
     setToggleAddPin(true);
   };
+
+  // handling geocoder
+  const handleViewportChange = useCallback(
+    (newViewport) => setViewport(newViewport),
+    []
+  );
+
+  const handleGeocoderViewportChange = useCallback(
+    (newViewport) => {
+      const geocoderDefaultOverrides = { transitionDuration: 1000 };
+
+      return handleViewportChange({
+        ...newViewport,
+        ...geocoderDefaultOverrides,
+      });
+    },
+    [handleViewportChange]
+  );
 
   const handleLogout = () => {
     localStorage.removeItem('pin-my-map-user');
@@ -75,6 +103,7 @@ const MapPage = () => {
         onViewportChange={setViewport}
         onClick={handleMapClick}
         onDblClick={handleMapDblClick}
+        ref={mapRef}
       >
         {pins &&
           pins.map((pin) => (
@@ -88,6 +117,26 @@ const MapPage = () => {
             />
           ))}
         {isLoading && <Loader />}
+        <Geocoder
+          mapboxApiAccessToken={process.env.REACT_APP_MAPBOX}
+          onViewportChange={handleGeocoderViewportChange}
+          position='top-left'
+          mapRef={mapRef}
+        />
+        {toggleAddPin && (
+          <Marker
+            latitude={newPin.lat}
+            longitude={newPin.long}
+            offsetLeft={-13} //centering marker
+            offsetTop={-40} //centering marker
+          >
+            <img
+              src='/img/marker_blue.svg'
+              alt='marker_pin'
+              style={{ cursor: 'pointer' }}
+            />
+          </Marker>
+        )}
       </ReactMapGL>
       <AnimatePresence>
         {toggleDrawer && (
@@ -98,7 +147,7 @@ const MapPage = () => {
             toggleEditPin={toggleEditPin}
             setToggleEditPin={setToggleEditPin}
             setViewport={setViewport}
-            ref={ref}
+            ref={drawerRef}
           />
         )}
       </AnimatePresence>
@@ -124,6 +173,21 @@ const Container = styled.div`
   position: relative;
   width: 100%;
   overflow: hidden;
+
+  .mapboxgl-ctrl {
+    margin: 15px 0 0 15px;
+  }
+
+  .mapboxgl-ctrl-geocoder {
+    box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%),
+      0px 2px 2px 0px rgb(0 0 0 / 14%), 0px 1px 5px 0px rgb(0 0 0 / 12%);
+  }
+
+  .mapboxgl-ctrl-geocoder--input {
+    :focus {
+      outline: none;
+    }
+  }
 `;
 
 const ButtonWrapper = styled.div`
@@ -131,8 +195,16 @@ const ButtonWrapper = styled.div`
   display: flex;
   top: 10px;
   right: 10px;
+  height: 40.4px;
 
   button {
     margin: 5px;
+  }
+
+  @media (max-width: 550px) {
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    top: 70px;
+    left: 10px;
   }
 `;

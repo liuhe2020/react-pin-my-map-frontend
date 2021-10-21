@@ -10,7 +10,7 @@ import PinDetails from './PinDetails';
 import AddPin from './AddPin';
 import EditPin from './EditPin';
 
-const Drawer = forwardRef((props, ref) => {
+const Drawer = forwardRef((props, drawerRef) => {
   const { currentPin } = useContext(GlobalContext);
 
   const {
@@ -22,7 +22,7 @@ const Drawer = forwardRef((props, ref) => {
     setToggleEditPin,
   } = props;
 
-  useImperativeHandle(ref, () => ({ handleDrawerClose }));
+  useImperativeHandle(drawerRef, () => ({ handleDrawerClose }));
 
   // this function is defined here instead of the parent(MapPage) component
   // passing in viewport as prop will cause this component to re-render even when using React.memo.
@@ -41,15 +41,14 @@ const Drawer = forwardRef((props, ref) => {
       }));
     }
     setToggleDrawer(false);
+    setToggleAddPin(false);
   };
-
-  console.log('Drawer');
 
   return (
     <Container
-      initial={{ x: '-100%' }}
+      initial={{ x: '100%' }}
       animate={{ x: 0 }}
-      exit={{ x: '-100%' }}
+      exit={{ x: '100%' }}
       transition={{ duration: 0.5 }}
     >
       <Wrapper>
@@ -85,16 +84,15 @@ const Container = styled(motion.div)`
   cursor: initial;
   position: absolute;
   top: 0;
-  left: 0;
+  right: 0;
   z-index: 2;
   background-color: #fff;
   width: 450px;
   height: 100%;
   padding: 30px 20px;
-  box-shadow: 0px 5px 5px -3px rgb(0 0 0 / 20%),
-    0px 8px 10px 1px rgb(0 0 0 / 14%), 0px 3px 14px 2px rgb(0 0 0 / 12%);
+  box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%),
+    0px 2px 2px 0px rgb(0 0 0 / 14%), 0px 1px 5px 0px rgb(0 0 0 / 12%);
   overflow-y: auto;
-  direction: rtl;
 
   ::-webkit-scrollbar {
     width: 10px;
@@ -117,7 +115,6 @@ const Container = styled(motion.div)`
 const Wrapper = styled.div`
   position: relative;
   padding: 0 20px 10px 20px;
-  direction: ltr;
 `;
 
 const CanelIcon = styled.div`
@@ -126,4 +123,8 @@ const CanelIcon = styled.div`
   right: 10px;
   color: #ed6c02;
   cursor: pointer;
+
+  :hover {
+    color: #e65100;
+  }
 `;

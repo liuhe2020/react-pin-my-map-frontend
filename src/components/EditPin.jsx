@@ -168,8 +168,6 @@ const EditPin = ({ setToggleEditPin }) => {
     setIsLoading(false);
   };
 
-  console.log('Edit Pin');
-
   return (
     <>
       <Title>

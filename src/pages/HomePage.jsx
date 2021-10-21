@@ -1,22 +1,22 @@
-import { Redirect } from "react-router-dom";
-import { useState, useContext } from "react";
-import styled from "styled-components";
+import { Redirect } from 'react-router-dom';
+import { useState, useContext } from 'react';
+import styled from 'styled-components';
 
-import Login from "../components/Login";
-import SignUp from "../components/SignUp";
-import Loader from "../components/Loader";
-import GlobalContext from "../context/GlobalContext";
+import Login from '../components/Login';
+import SignUp from '../components/SignUp';
+import Loader from '../components/Loader';
+import GlobalContext from '../context/GlobalContext';
 
 const HomePage = () => {
   const { isLoading, authUser } = useContext(GlobalContext);
   const [isSignUp, setIsSignUp] = useState(false);
 
-  if (authUser) return <Redirect to="/map" />;
+  if (authUser) return <Redirect to='/map' />;
 
   return (
     <Container>
       <Main>
-        <Logo src="./img/pin_logo_s.png" alt="pin_my_map_logo" />
+        <Logo src='/img/pin_logo_s.png' alt='pin_my_map_logo' />
         <TitleWrapper>
           <h1>Pin My Map</h1>
           <h2>Record and share places that you have been.</h2>
@@ -33,7 +33,7 @@ const HomePage = () => {
       <Footer>
         <p>&copy; 2021 Pin My Map</p>
       </Footer>
-      <Background src="./img/background.jpg" alt="pin_my_map_background" />
+      <Background src='/img/background.jpg' alt='pin_my_map_background' />
     </Container>
   );
 };

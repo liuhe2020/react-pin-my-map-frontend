@@ -1,9 +1,11 @@
-import { useState, useEffect, useContext, useRef } from 'react';
+import 'mapbox-gl/dist/mapbox-gl.css';
+import { useState, useEffect, useContext, useCallback, useRef } from 'react';
 import styled from 'styled-components';
+import { styled as muiStyled } from '@mui/material/styles';
 import { useParams } from 'react-router';
 import { useHistory } from 'react-router-dom';
 import ReactMapGL from 'react-map-gl';
-import 'mapbox-gl/dist/mapbox-gl.css';
+import Geocoder from 'react-map-gl-geocoder';
 import Button from '@mui/material/Button';
 import { toast } from 'react-toastify';
 import { Helmet } from 'react-helmet-async';
@@ -32,13 +34,32 @@ const UserMapPage = () => {
     zoom: 4,
   });
 
-  const ref = useRef();
+  const mapRef = useRef();
+  const drawerRef = useRef();
 
   const handleMapClick = () => {
     if (toggleDrawer) {
-      ref.current.handleDrawerClose();
+      drawerRef.current.handleDrawerClose();
     }
   };
+
+  // handling geocoder
+  const handleViewportChange = useCallback(
+    (newViewport) => setViewport(newViewport),
+    []
+  );
+
+  const handleGeocoderViewportChange = useCallback(
+    (newViewport) => {
+      const geocoderDefaultOverrides = { transitionDuration: 1000 };
+
+      return handleViewportChange({
+        ...newViewport,
+        ...geocoderDefaultOverrides,
+      });
+    },
+    [handleViewportChange]
+  );
 
   const handleSignUp = () => {
     history.push('/');
@@ -77,6 +98,7 @@ const UserMapPage = () => {
         mapboxApiAccessToken={process.env.REACT_APP_MAPBOX}
         onViewportChange={setViewport}
         onClick={handleMapClick}
+        ref={mapRef}
       >
         {user &&
           user.pins.map((pin) => (
@@ -91,6 +113,12 @@ const UserMapPage = () => {
           ))}
         {isLoading && <Loader />}
       </ReactMapGL>
+      <Geocoder
+        mapboxApiAccessToken={process.env.REACT_APP_MAPBOX}
+        onViewportChange={handleGeocoderViewportChange}
+        position='top-left'
+        mapRef={mapRef}
+      />
       <AnimatePresence>
         {toggleDrawer && (
           <Drawer
@@ -100,19 +128,18 @@ const UserMapPage = () => {
             toggleEditPin={toggleEditPin}
             setToggleEditPin={setToggleEditPin}
             setViewport={setViewport}
-            ref={ref}
+            ref={drawerRef}
           />
         )}
       </AnimatePresence>
-      <Button
+      <StyledButton
         variant='contained'
         size='small'
         color='warning'
-        style={{ position: 'absolute', top: '15px', left: '15px' }}
         onClick={handleSignUp}
       >
         Sign Up
-      </Button>
+      </StyledButton>
     </Container>
   );
 };
@@ -123,4 +150,30 @@ const Container = styled.div`
   position: relative;
   width: 100%;
   overflow: hidden;
+
+  .mapboxgl-ctrl {
+    margin: 15px 0 0 15px;
+  }
+
+  .mapboxgl-ctrl-geocoder {
+    box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%),
+      0px 2px 2px 0px rgb(0 0 0 / 14%), 0px 1px 5px 0px rgb(0 0 0 / 12%);
+  }
+
+  .mapboxgl-ctrl-geocoder--input {
+    :focus {
+      outline: none;
+    }
+  }
+`;
+
+const StyledButton = muiStyled(Button)`
+  position: absolute;
+  top: 15px;
+  right: 15px;
+
+  @media (max-width: 550px) {
+  top: 75px;
+  left: 15px;
+  }
 `;

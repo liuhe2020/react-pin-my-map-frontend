@@ -2,8 +2,6 @@ import React from 'react';
 import { useContext } from 'react';
 import { Marker, FlyToInterpolator } from 'react-map-gl';
 import { easeCubic } from 'd3-ease';
-import { Room } from '@mui/icons-material';
-import { styled as muiStyled } from '@mui/material/styles';
 
 import GlobalContext from '../context/GlobalContext';
 
@@ -26,30 +24,28 @@ const Pin = ({
       ...prevState,
       zoom: 12,
       latitude: pin.latitude,
-      longitude: pin.longitude - 0.000085 * 450, //offset viewport(pin to centre of map) when sidebar toggled
+      longitude: pin.longitude + 0.000085 * 450, //offset viewport(pin to centre of map) when sidebar toggled
       transitionInterpolator: new FlyToInterpolator(),
       transitionDuration: 800,
       transitionEasing: easeCubic,
     }));
   };
 
-  console.log('Marker');
-
   return (
     <Marker
       latitude={pin.latitude}
       longitude={pin.longitude}
-      offsetLeft={-15} //centering marker
-      offsetTop={-30} //centering marker
+      offsetLeft={-13} //centering marker
+      offsetTop={-40} //centering marker
     >
-      <StyledRoomIcon color='warning' onClick={handleMarkerClick} />
+      <img
+        src='/img/marker.svg'
+        alt='marker-pin'
+        style={{ cursor: 'pointer' }}
+        onClick={handleMarkerClick}
+      />
     </Marker>
   );
 };
 
 export default React.memo(Pin);
-
-const StyledRoomIcon = muiStyled(Room)`
-  font-size: 30px;
-  cursor: pointer;
-`;

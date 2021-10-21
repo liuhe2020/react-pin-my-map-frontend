@@ -38,8 +38,6 @@ const PinDetails = ({ handleDrawerClose, setToggleEditPin }) => {
     setIsLoading(false);
   };
 
-  console.log('Pin Details');
-
   return (
     <>
       <Details>
