@@ -1,16 +1,16 @@
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
-import { ToastContainer, Slide } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import styled from "styled-components";
-import { ThemeProvider } from "@mui/material";
-import MuiTheme from "./MuiTheme";
-import SimpleReactLightbox from "simple-react-lightbox";
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import { ToastContainer, Slide } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import styled from 'styled-components';
+import { ThemeProvider } from '@mui/material';
+import MuiTheme from './MuiTheme';
+import SimpleReactLightbox from 'simple-react-lightbox';
 
-import GlobalStyles from "./globalStyles";
-import { GlobalProvider } from "./context/GlobalContext";
-import HomePage from "./pages/HomePage";
-import MapPage from "./pages/MapPage";
-import UserMapPage from "./pages/UserMapPage";
+import GlobalStyles from './globalStyles';
+import { GlobalProvider } from './context/GlobalContext';
+import HomePage from './pages/HomePage';
+import MapPage from './pages/MapPage';
+import UserMapPage from './pages/UserMapPage';
 
 function App() {
   return (
@@ -20,13 +20,13 @@ function App() {
         <SimpleReactLightbox>
           <Router>
             <Switch>
-              <Route path="/map">
+              <Route path='/map'>
                 <MapPage />
               </Route>
-              <Route path="/maps/:id">
+              <Route path='/maps/:id'>
                 <UserMapPage />
               </Route>
-              <Route path="/">
+              <Route path='/'>
                 <HomePage />
               </Route>
             </Switch>
@@ -34,7 +34,7 @@ function App() {
         </SimpleReactLightbox>
       </ThemeProvider>
       <StyledToastContainer
-        position="top-left"
+        position='bottom-left'
         autoClose={4000}
         hideProgressBar
         newestOnTop={false}
@@ -50,7 +50,7 @@ function App() {
 export default App;
 
 const StyledToastContainer = styled(ToastContainer).attrs({
-  className: "toast-container",
+  className: 'toast-container',
 })`
   width: 280px;
 `;

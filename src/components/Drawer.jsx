@@ -89,7 +89,6 @@ const Container = styled(motion.div)`
   background-color: #fff;
   width: 450px;
   height: 100%;
-  padding: 30px 20px;
   box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%),
     0px 2px 2px 0px rgb(0 0 0 / 14%), 0px 1px 5px 0px rgb(0 0 0 / 12%);
   overflow-y: auto;
@@ -103,10 +102,6 @@ const Container = styled(motion.div)`
     background: #9e9e9e;
   }
 
-  @media (max-width: 768px) {
-    padding: 30px 10px;
-  }
-
   @media (max-width: 450px) {
     width: 100%;
   }
@@ -114,7 +109,11 @@ const Container = styled(motion.div)`
 
 const Wrapper = styled.div`
   position: relative;
-  padding: 0 20px 10px 20px;
+  padding: 30px 40px 40px;
+
+  @media (max-width: 768px) {
+    padding: 30px 30px 40px;
+  }
 `;
 
 const CanelIcon = styled.div`
@@ -123,6 +122,7 @@ const CanelIcon = styled.div`
   right: 10px;
   color: #ed6c02;
   cursor: pointer;
+  z-index: 2;
 
   :hover {
     color: #e65100;

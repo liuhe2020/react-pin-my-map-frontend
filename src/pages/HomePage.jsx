@@ -19,7 +19,7 @@ const HomePage = () => {
         <Logo src='/img/pin_logo_s.png' alt='pin_my_map_logo' />
         <TitleWrapper>
           <h1>Pin My Map</h1>
-          <h2>Record and share places that you have been.</h2>
+          <h2>Record and share all the places that you have been to.</h2>
         </TitleWrapper>
         <FormWrapper>
           {isSignUp ? (
@@ -49,12 +49,14 @@ const Container = styled.div`
 const Main = styled.div`
   display: flex;
   justify-content: center;
+  align-items: center;
   min-height: 100vh;
+  padding-bottom: 10vw;
 
   @media (max-width: 768px) {
     flex-direction: column;
-    align-items: center;
     justify-content: flex-start;
+    padding-top: 10vw;
   }
 `;
 
@@ -77,11 +79,11 @@ const Logo = styled.img`
 `;
 
 const TitleWrapper = styled.div`
-  margin: 180px 5vw 0 5vw;
+  margin: 0 5vw 3vw 5vw;
   width: 400px;
 
   @media (max-width: 768px) {
-    width: 80%;
+    width: 360px;
     margin: 100px 0 50px 0;
     text-align: center;
   }
@@ -98,14 +100,15 @@ const TitleWrapper = styled.div`
 
   h2 {
     color: #212121;
-    font-weight: 600;
+    font-weight: 500;
     font-size: 24px;
-    margin: 10px 0 0 0;
+    line-height: 32px;
+    margin: 20px 0 0 0;
   }
 `;
 
 const FormWrapper = styled.div`
-  margin: 120px 5vw 0 5vw;
+  margin: 0 5vw;
 
   @media (max-width: 768px) {
     margin: 0 0 0 0;
