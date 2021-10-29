@@ -1,6 +1,8 @@
 {
   "name": "pin-my-map",
-  "version": "2.1.3",
+  "author": "liu he",
+  "description": "web app for recording the places you have been to and share them with friends and family",
+  "version": "2.1.4",
   "private": true,
   "dependencies": {
     "@date-io/date-fns": "^1.3.13",
