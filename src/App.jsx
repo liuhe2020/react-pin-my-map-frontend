@@ -20,13 +20,13 @@ function App() {
         <SimpleReactLightbox>
           <Router>
             <Switch>
-              <Route path='/map'>
+              <Route exact path='/map'>
                 <MapPage />
               </Route>
-              <Route path='/maps/:id'>
+              <Route exact path='/maps/:id'>
                 <UserMapPage />
               </Route>
-              <Route path='/'>
+              <Route exact path='/'>
                 <HomePage />
               </Route>
             </Switch>
