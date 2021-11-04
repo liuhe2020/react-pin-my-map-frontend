@@ -11,6 +11,7 @@ import { GlobalProvider } from './context/GlobalContext';
 import HomePage from './pages/HomePage';
 import MapPage from './pages/MapPage';
 import UserMapPage from './pages/UserMapPage';
+import NotFoundPage from './pages/NotFoundPage';
 
 function App() {
   return (
@@ -20,15 +21,10 @@ function App() {
         <SimpleReactLightbox>
           <Router>
             <Switch>
-              <Route exact path='/map'>
-                <MapPage />
-              </Route>
-              <Route exact path='/maps/:id'>
-                <UserMapPage />
-              </Route>
-              <Route exact path='/'>
-                <HomePage />
-              </Route>
+              <Route exact path='/' component={HomePage}></Route>
+              <Route exact path='/map' component={MapPage}></Route>
+              <Route path='/maps/:id' component={UserMapPage}></Route>
+              <Route path='/*' component={NotFoundPage}></Route>
             </Switch>
           </Router>
         </SimpleReactLightbox>
