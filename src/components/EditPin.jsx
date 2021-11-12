@@ -225,7 +225,7 @@ const EditPin = ({ setToggleEditPin }) => {
                 ))}
             </PhotosGrid>
           )}
-          <p>The maximum image size is 5MB.</p>
+          <p>The maximum image size is 1MB.</p>
           <label htmlFor='contained-button-file'>
             <Input
               accept='image/*'

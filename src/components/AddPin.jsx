@@ -38,10 +38,12 @@ const AddPin = ({ handleDrawerClose, setToggleAddPin }) => {
   const handleImageChange = (e) => {
     // convert Filelist object to array and update in images state
     const imageFiles = [...e.target.files];
-    // check images size
-    const bigImages = imageFiles.filter((file) => file.size > 1024 * 1000);
+    // check images size - limit 1MB
+    const oversizedImages = imageFiles.filter(
+      (file) => file.size > 1024 * 1000
+    );
 
-    if (bigImages.length > 0) {
+    if (oversizedImages.length > 0) {
       toast.warn('The maximum size for each image is 1MB.');
     } else {
       setImages([...imageFiles]);
@@ -142,7 +144,7 @@ const AddPin = ({ handleDrawerClose, setToggleAddPin }) => {
               ))}
             </PhotosGrid>
           )}
-          <p>The maximum image size is 5MB.</p>
+          <p>The maximum image size is 1MB.</p>
           <label htmlFor='contained-button-file'>
             <Input
               accept='image/*'
