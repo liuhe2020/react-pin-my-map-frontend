@@ -137,7 +137,7 @@ const SignUp = ({ setIsSignUp }) => {
           style={{ width: '100%' }}
           onClick={handleSubmit}
         >
-          Sign Up
+          Sign up
         </StyledButton>
         <BreakLine />
         <StyledButton

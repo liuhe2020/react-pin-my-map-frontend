@@ -102,7 +102,7 @@ const Login = ({ setIsSignUp }) => {
           color='primary'
           onClick={() => setIsSignUp(true)}
         >
-          Sign Up
+          Sign up
         </StyledButton>
       </Form>
     </Container>

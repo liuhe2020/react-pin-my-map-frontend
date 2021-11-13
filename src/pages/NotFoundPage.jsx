@@ -1,12 +1,20 @@
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import Button from '@mui/material/Button';
+import { Helmet } from 'react-helmet-async';
 
 const NotFoundPage = () => {
   const history = useHistory();
 
   return (
     <Container>
+      <Helmet>
+        <title>Pin My Map | Page Not Found</title>
+        <meta
+          name='description'
+          content='Pin My Map - view personalised map with pinned places the user has been to.'
+        />
+      </Helmet>
       <Wrapper>
         <h1>Page not found.</h1>
         <Button

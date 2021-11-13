@@ -85,7 +85,7 @@ const UserMapPage = () => {
   return (
     <Container>
       <Helmet>
-        <title>{user && `Pin My Map | ${user.username}'s map`}</title>
+        <title>{user && `Pin My Map | ${user.username}`}</title>
         <meta
           name='description'
           content='Pin My Map - view personalised map with pinned places the user has been to.'

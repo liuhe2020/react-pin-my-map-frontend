@@ -1,6 +1,7 @@
-import { Redirect } from 'react-router-dom';
 import { useState, useContext } from 'react';
+import { Redirect, Link } from 'react-router-dom';
 import styled from 'styled-components';
+import Button from '@mui/material/Button';
 
 import Login from '../components/Login';
 import SignUp from '../components/SignUp';
@@ -20,6 +21,13 @@ const HomePage = () => {
         <TitleWrapper>
           <h1>Pin My Map</h1>
           <h2>Record and share all the places that you have been to.</h2>
+          <Link
+            to='/maps/5' // 5 is the ID of user named demo
+          >
+            <Button variant='contained' color='primary' type='submit'>
+              Demo
+            </Button>
+          </Link>
         </TitleWrapper>
         <FormWrapper>
           {isSignUp ? (
@@ -103,7 +111,15 @@ const TitleWrapper = styled.div`
     font-weight: 500;
     font-size: 24px;
     line-height: 32px;
-    margin: 20px 0 0 0;
+    margin-top: 20px;
+  }
+
+  button {
+    margin-top: 20px;
+  }
+
+  a {
+    text-decoration: none;
   }
 `;
 
