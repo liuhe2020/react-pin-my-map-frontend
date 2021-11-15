@@ -32,6 +32,8 @@ const UserMapPage = () => {
     latitude: 46,
     longitude: 17,
     zoom: 4,
+    minZoom: 1.585, // limit zoom out to single world map
+    maxZoom: 19,
   });
 
   const mapRef = useRef();
