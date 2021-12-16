@@ -19,7 +19,7 @@ const Loader = () => {
 
   return (
     <LoaderOverlay>
-      {showMsg && <p>Please wait for loading. It may take upto 30 seconds.</p>}
+      {showMsg && <p>Please wait for loading. It may take up to 30 seconds.</p>}
       <SyncLoader color='#ed6c02' loading={isLoading} />
     </LoaderOverlay>
   );
