@@ -39,7 +39,7 @@ const HomePage = () => {
         {isLoading && <Loader />}
       </Main>
       <Footer>
-        <p>&copy; 2021 Pin My Map</p>
+        <p>&copy; 2022 Pin My Map</p>
       </Footer>
       <Background src='/img/background.jpg' alt='pin_my_map_background' />
     </Container>
